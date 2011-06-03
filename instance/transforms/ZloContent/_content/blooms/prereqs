@@ -1,0 +1,7 @@
+<b>System Requirements/Prerequisites</b>
+
+This page will guide the reader through setting up the standard tools that enable the blooms system.
+
+The XC System's most advanced runtime target is currently <u><a target="_blank" href="http://modpython.org">mod_python 3.3.10</a></u> running on top of <u><a target="_blank" href="http://apache.org">Apache 2.24</a></u>. It uses the <u><a target="_blank" href="http://zope.org">ZODB 3.60</a></u> from Zope.org for persistence currently. 
+
+The following is instructions on how to prepare this server environment using the above for a standard XC System install.

@@ -1,0 +1,1242 @@
+<!--
+    Copyright 2004-2007 Laszlo Systems, Inc.  All Rights Reserved.
+    Unauthorized use, duplication or distribution is strictly prohibited.
+    This software is the proprietary information of Laszlo Systems, Inc.
+    Use is subject to license terms.
+-->
+
+
+<library>
+
+    <stylesheet>
+        folder {
+            textcolor : #000000;            
+            textunreadcolor : #3B3B3B;
+        }
+    </stylesheet>
+    <!--- A folder is an item contained in a foldersummary's flist,
+          or recursively contained in another folder's flist.
+          It may expand a next level of folders if the folder has children. -->
+    <class name="folder" x="5" visible="false" focusable="false" >
+
+        <!--- The type of the folder. One of 'user', 'inbox', 'draft', 'sent',
+              'junk', 'suspect', 'quarantine', 'trash'. Default is 'user'. -->
+        <attribute name="foldertype" value="user" type="string" />
+
+        <!--- The color of the tint applied to the selection hilite -->
+        <attribute name="selectedcolor" value="null"/>
+
+        <!--- The color of the tint applied to the mouseover hilite -->
+        <attribute name="hilitecolor" value="null"/>
+
+        <!--- The color of the text -->
+        <attribute name="textcolor" value="$style{'textcolor'}"/>
+
+        <!--- The color of the unread text -->
+        <attribute name="textunreadcolor" value="$style{'textunreadcolor'}"/>        
+
+        <!--- @keywords private -->
+        <attribute name="treesel" value="null"/>
+
+        <!--- @keywords private -->
+        <attribute name="selected" value="false"/>
+
+        <!--- True if this folder can be dragged elsewhere.
+              @keywords private -->
+        <attribute name="dragable" value="true"/>
+
+        <!--- True if other folders can be dragged into this folder.
+              @keywords private -->
+        <attribute name="folderdroptarget" value="true"/>
+
+        <!--- True if messages can be dragged into this folder.
+              @keywords private -->
+        <attribute name="msgdroptarget" value="true"/>
+
+        <!--- Whether the folder displays its subchildren (read-only), depends on useropened and non-zero subfolders -->
+        <attribute name="opened" value="${this.useropened &amp;&amp; this.subfoldercount &gt; 0}"/>
+
+        <!--- Whether the user interface wants the folder to be opened
+              @keywords private -->
+        <attribute name="useropened" value="false"/>
+
+        <!--- width of the folder view -->
+        <attribute name="width" value="${this.immediateparent.width - this.x}"/>
+
+        <!--- internal flag
+            @keywords private -->
+        <attribute name="_mouseisover" value="false" />
+
+        <!--- Delegate for handling foldersummary ondata.
+              @keywords private -->
+        <attribute name="_subfolderDataDel" value="null" />
+
+        <!--- Delegate for handling foldersummary onerror and ontimeout
+              @keywords private -->
+        <attribute name="_subfolderErrorDel" value="null" />
+
+        <!--- delegate for receiving new mail notification
+            @keywords private -->
+        <attribute name="_newmaildel" value="null" />
+
+        <!--- used by 'checkdrag' state
+            @keywords private -->
+        <attribute name="dragging" value="false" />
+
+        <!--- @keywords private -->
+        <attribute name="_onstopdel" value="null"/>
+
+        <!--- the number of subfolders that this folder has -->
+        <attribute name="subfoldercount" value="$path{'@subfoldercount'}"/>
+
+        <!--- the number of unread messages that this folder has -->
+        <attribute name="unreadcount" value="$path{'@unreadcount'}"
+            setter="this.setUnreadCount(unreadcount)"/>
+
+        <!--- The number of messages that this folder has, from xml folder
+              attribute msgcount -->
+        <attribute name="msgcount" value="$path{'@msgcount'}"
+                   setter="this.setMsgCount(msgcount)"/>
+
+        <!--- the short name of this folder, from xml folder attribute name -->
+        <attribute name="displayname" value="$path{'@name'}"/>
+
+        <!--- the full name of this folder, from xml folder attribute fullname -->
+        <attribute name="fullname" value="$path{'@fullname'}"/>
+
+        <!--- How long to wait when hovering over folder, before automatically opening it. -->
+        <attribute name="autoOpenTimerDelay" value="500"/>
+
+        <!--- @keywords private -->
+        <attribute name="autoOpenTimerDelegate" value="null"/>
+
+        <!--- Remembers if we're editing the name.
+              @keywords private -->
+        <attribute name="editingName" value="false"/>
+
+        <!--- how long to wait to distinguish double click on selected folder
+              from single click to edit label -->
+        <attribute name="clickToEditDelay" value="500"/>
+
+        <!--- @keywords private -->
+        <attribute name="clickToEditDelegate" value="null"/>
+
+        <!--- @keywords private -->
+        <attribute name="clickToEditState" value="0"/>
+
+        <!--- Set to true when busy to spin busy animation. -->
+        <attribute name="spinning" value="false"/>
+
+        <!--- The user can't click on the folder while it's spinning. -->
+        <attribute name="clickable" value="${!this.spinning}"/>
+
+        <!--- Vertical position of plus/minus button -->
+        <attribute name="plusminusy" value="8"/>
+
+        <!--- Flag to track if rename in progress -->
+        <attribute name="renameinprogress" value="false"/>
+
+        <!--- Ignores displaying unread count and bolding folder view if unread
+              messages exist. -->
+        <attribute name="ignoreunread" value="false"/>
+
+        <!--- Event sent when unreadcount changes. -->
+        <attribute name="onunreadcount" value="null" />
+
+        <!-- hilite view drawn behind the icon and label to show selected state -->
+        <basecomponent name="hilite" stretches="both" width="${parent.width}" 
+                       height="24" resource="$style{'resource'}" x="-1"
+                       focusable="false" onmousedown="gFolderSummary.grabFocus()"/>
+
+        <!-- horizontal line to left of icon, connecting to vertical line
+             of containing folder -->
+        <view name="hline" x="0" y="12" width="17" height="1" bgcolor="0xcccccc" />
+
+        <!-- plusminus view to show if subfolders opened or closed,
+             to left of icon, where my horizontal line and container's
+             vertical line meet -->
+        <view name="plusminus" resource="mail_plusminus_rsc" x="-5" y="8" 
+              frame="${parent.opened ? 2 : 1}"
+              visible="${ Number(parent.subfoldercount) > 0 }"
+              clickable="${ ! parent.spinning }" 
+              onclick="if ( ! parent.spinning ) parent.toggleSubFolder()" />
+
+        <view name="icn" x="10" y="4" resource="mail_folder_rsc" />
+
+        <view name="spinner" x="14" y="8" width="10" height="10" 
+              stretches="both" resource="$style{'spinnerresource'}"
+              visible="${parent.spinning}" play="${parent.spinning}"/>
+
+        <!-- foldernametext displays short folder name -->
+        <text name="foldernametext" x="30" y="4" resize="true"
+              fgcolor="${classroot.unreadcount == 0 || classroot.ignoreunread 
+                       ? classroot.textcolor 
+                       : classroot.textunreadcolor}" 
+              focusable="false"
+              text="${classroot.displayname + 
+                      (classroot.unreadcount == 0 || classroot.ignoreunread
+                      ? '' 
+                      : ' (' + classroot.unreadcount + ')') }">
+            <method name="setText" args="t"><![CDATA[
+                if (classroot.unreadcount != 0 && ! classroot.ignoreunread) {
+                    t = '<b>' + t + '</b>';                    
+                }
+                super.setText(t);
+                ]]>
+            </method>
+        </text>
+
+        <!-- contains list of subfolders, visible when opened -->
+        <view name="flist" x="0" y="24" visible="${parent.opened}"
+              fontstyle="plain" width="${ parent.width - this.x }">
+            <datapath/>
+            <view name="vline" width="1" x="16" y="-6" bgcolor="0xcccccc" 
+                  visible="false"/>
+            <method name="setVisible" args="v"><![CDATA[
+                super.setVisible(v);
+                if (! this.isinited) return;
+                var sv = this.subviews;
+                for (var i=1; i < sv.length; i++) {
+                    if (v) {
+                        // folders still need to register themselves with
+                        // LzTrack during init since they don't come into 
+                        // existence immediately when flist is first 
+                        // databound. -pk
+                        LzTrack.register(sv[i], 'folders');
+                    } else {
+                        LzTrack.unregister(sv[i], 'folders');
+                    }
+                }
+                ]]>
+            </method>
+        </view>
+
+        <!--- This view prevents this folder and its children from being clicked
+              on when this folder is busy -->
+        <state apply="${parent.spinning}">
+            <view name="obscure" width="${ parent.width }" height="${ parent.height }" 
+                  clickable="true" showhandcursor="false" 
+                  opacity="0.3"/>
+        </state>
+
+        <!-- state for editing the name. -->
+        <state name="editname">
+            <!-- background behind text editor to cover up folder name we're editing -->
+            <view name="group" bgcolor="0x000000" x="30" y="1" 
+                  width="${parent.width - this.x}" height="22">
+
+                <view name="background" bgcolor="0xffffff" x="1" y="1"
+                      width="${parent.width - this.x - 2}" height="20"/>
+
+                <!-- input text for editing name -->
+                <inputtext name="nameeditor" x="0" y="3" height="18" 
+                           resizable="false" multiline="false"
+                           width="${parent.width - this.x - 4}">
+                    <!--- @keywords private -->
+                    <method event="onkeydown" args="arg"><![CDATA[
+                        switch (arg) {
+                            case 9: // tab
+                            case 10: // newline
+                            case 13: { // return
+                                this.setPattern("[^ -~]*");
+                                classroot.commitEditing();
+                                break;
+                            }
+
+                            case 27: { // escape
+                                classroot.abortEditing();
+                                break;
+                            }
+
+                        }
+                        ]]>
+                    </method>
+                </inputtext>
+
+                <!--- @keywords private -->
+                <method name="passModeEvent" args="event_name, view"><![CDATA[
+                    if (event_name == "onmousedown") {
+                        var x = this.getMouse("x");
+                        var y = this.getMouse("y");
+                        if ((x >= 0) && (x < this.width) &&
+                            (y >= 0) && (y < this.height)) {
+                            return false;
+                        }
+                        parent.commitEditing();
+                    }
+                    return true;
+                    ]]>
+                </method>
+
+            </view> <!-- group -->
+
+            <!--- when editname state is applied, set up the initial text
+                  editor. -->
+            <method event="onapply">
+                var group = this.parent.group;
+                var nameeditor = group.nameeditor;
+                var val = this.parent.displayname;
+
+                nameeditor.setPattern(gFolderService.allowedNameRegex);
+
+                // FIXME: [dhopkins 4/13/2005]: I read the source to setPattern, and it looks like there's a bug. 
+                // It should subtract 3 instead of 2 from the length if the string when chopping off the "[" and "]*".
+                // The bug causes a stray close bracket to be included at the end of the pattern string. 
+                
+                nameeditor.setAttribute("text", val);
+                nameeditor.setSelection(0, val.length);
+                LzModeManager.makeModal(group);
+            </method>
+
+            <!--- When editname state is removed, tear down the text editor and
+                  de-modalify. -->
+            <method event="onremove">
+                LzModeManager.release(this.parent.group);
+            </method>
+
+        </state>
+
+        <!-- state to detect and handle dragging folders -->
+        <checkdragstate name="checkdrag" draggername="folderdragger">
+
+            <!--- @keywords private -->
+            <method event="onapply">
+                // TODO: When we start dragging, it might look nice to hide the selection.
+                // But we should restore it after the drag operation is complete.
+                // Note that if the selection is contained within the sub-tree we're moving,
+                // we should reselect the right folder after the drag completes.
+                if (parent.editingName) {
+                    parent.abortEditing();
+                }
+            </method>
+
+        </checkdragstate>
+
+
+        <!--- @keywords private -->
+        <method name="init">
+            super.init();
+
+            if (! this.fullname) return;
+
+            if (this.datapath.p.attributes['nonexistent'] != 1) {
+                var myfolder = gMailService.getFolder(this.fullname);
+                myfolder.foldernode = this.datapath.p;
+                myfolder.folderview = this;
+                LzTrack.register(this, 'folders');
+            }
+
+            // If we have the same name, then we're a singleton clone,
+            // or if our clonenumber is the replication manager's nodes length
+            // minus one, then we're the last clone.
+            if ((this.name == 'folder') ||
+                (this.clonenumber == (parent.folder.nodes.length - 1))) {
+                if (gFolderService['onfolderlayoutchanged']) {
+                    gFolderService.onfolderlayoutchanged.sendEvent();
+                }
+            }
+        </method>
+
+        <!--- Called when data applied to set folder icons and update other stuff
+              @keyword private -->
+        <method event="ondata"><![CDATA[
+            var node = this.datapath['p'];
+            if (!node) return;
+
+            var attrs = node.attributes;
+            
+            if (attrs['nonexistent'] == 1) {
+                this.startEditingName();
+                return;
+            }
+
+            var fullname = attrs.fullname;
+
+            if ( attrs['type'] && attrs.type != 'user' ) {
+                var type = this.foldertype = attrs.type;
+
+                switch (type) {
+                    case 'inbox':
+                    case 'draft': 
+                    case 'sent': 
+                    case 'trash': 
+                    case 'search':
+                    case 'junk':
+                    case 'suspect':
+                    case 'quarantine': {
+                        // Notify msg count now that mailfolder has access to
+                        // foldernode data set above.
+                        if (type == 'inbox') {
+                            if (gMailService.currentfolder) {
+                                gMailService.currentfolder.notifyMsgCount();
+                            }
+                            var inbox = gMailService.getFolder(mailmodule.config.inboxfolder);
+                            inbox.displayname = this.displayname;
+                        } else {
+                            if (type == 'trash') {
+                                gToolbarView.updateemptybtndel.register(this, 'onmsgcount');
+                                this.onmsgcount.sendEvent(this.msgcount);
+                            }
+                            this.setAttribute("ignoreunread", true);
+
+                            // add folder names to mailmodule.config.
+                            mailmodule.config.setAttribute(type + 'folder', fullname);
+                        }
+                        break;
+                    }
+                }
+
+                gFolderService.specialfolders[fullname] = true;
+                this.icn.setResource('mail_folder_' + type + '_rsc');
+
+                if (type == 'inbox') {
+                    this.treesel.select(this);
+                    if (!this._newmaildel) {
+                        this._newmaildel = 
+                            new LzDelegate(this, "updateNewMail", gMailService, "onnewmail");
+                    }
+                    this.updateNewMail();
+                }
+            }
+
+            var myfolder = gMailService.getFolder(fullname);
+            myfolder.foldernode = node;
+            myfolder.folderview = this;
+
+            this.dragable         = ( attrs['dragable']         != '0' );
+            this.msgdroptarget    = ( attrs['msgdroptarget']    != '0' );
+            this.folderdroptarget = ( attrs['folderdroptarget'] != '0' );
+
+            this.updateExpansion();
+            ]]>
+        </method>
+
+        <!--- Sets the unread count.
+              @param Number unreadcount: number of unread messages in the folder.
+              @keywords private -->
+        <method name="setUnreadCount" args="unreadcount">
+            this.unreadcount = Number(unreadcount);
+            if (this.onunreadcount) this.onunreadcount.sendEvent(unreadcount);
+        </method>
+
+        <!--- Sets the msgcount count.
+              @param Number msgcount: number of messages in the folder.
+              @keywords private -->
+        <method name="setMsgCount" args="msgcount"><![CDATA[
+            this.msgcount = Number(msgcount);
+            if (this['onmsgcount']) this.onmsgcount.sendEvent(msgcount);
+            ]]>
+        </method>
+
+        <!--- @keywords private -->
+        <method name="updateNewMail">
+            this.icn.setAttribute('frame', (gMailService.newmail ? 2 : 1));
+        </method>
+
+        <!--- @keywords private -->
+        <method name="gotSubfolders" args="req">
+            this.setAttribute("useropened", true);
+            this.setAttribute("spinning", false);
+
+            this.flist.datapath.setPointer(req.result);
+
+            if (! this.flist['folder']) {
+                new folder( this.flist, {
+                     name: "folder"
+                    ,datapath: "folder"
+                    ,treesel: this.treesel
+                    ,hilitecolor: this.hilitecolor
+                    ,selectedcolor: this.selectedcolor
+                });
+            }
+
+            gFolderService.onfolderlayoutchanged.sendEvent();
+        </method>
+
+
+        <!--- Flushes subfolders to reuse this view w/another dataset -->
+        <method name="flushSubFolders"><![CDATA[
+            var f = this.flist['folder'];
+            if (!f) return;
+            f.setDatapath("nothingMatches"); 
+            f.destroy();
+            ]]>
+        </method>
+
+
+        <!--- close the folder: stop displaying children and toggle the +/- icon -->
+        <method name="closeSubFolders">
+            // When we close a folder whose subfolder is selected, the selection should migrate up to this folder. 
+            // Check to see if one of the descendants is selected.
+            var prefix = this.fullname + mailmodule.config.folderseparator;
+            if (this.treesel.selectionName.substring(0, prefix.length) == prefix) {
+                // We will take the selection from our descendent, who's going into hiding. 
+                this.treesel.select(this);
+            }
+
+            gFolderService.removeExpandedFolder(this);
+            this.setAttribute("useropened", false);
+            gFolderService.onfolderlayoutchanged.sendEvent();
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="updateExpansion"><![CDATA[
+            if (gFolderService.isFolderExpanded(this) &&
+                (Number(this.subfoldercount) != 0)) {
+                this.openSubFolders();
+            } else {
+                if (this.opened) this.closeSubFolders();
+            }
+            ]]>
+        </method>
+
+
+        <!--- toggle the folder between open and closed states -->
+        <method name="toggleSubFolder">
+             this.cancelAutoOpenTimer();
+
+             if (this.renameinprogress) return;
+
+             this.commitEditing();
+
+             if (this.opened) {
+                 this.closeSubFolders();
+             } else {
+                 this.openSubFolders();
+             }
+        </method>
+
+
+        <!--- open the folder: get the list of children and display it, toggle the +/- icon -->
+        <method name="openSubFolders"><![CDATA[
+            if (this.isSpinning()) return;
+
+            gFolderService.addExpandedFolder(this);
+
+            if (this._subfolderDataDel == null) {
+                this._subfolderDataDel = new LzDelegate(this, "gotSubfolders");
+            } else {
+                // Unregister old _subfolderDataDel and reregister it with the new dataset,
+                // which may have changed if the folder was renamed. 
+                this._subfolderDataDel.unregisterAll();
+            }
+
+            if (this._subfolderErrorDel == null) {
+                this._subfolderErrorDel = new LzDelegate(this, "subfolderError");
+            } else {
+                // Unregister old _subfolderErrorDel and reregister it with
+                // the new dataset, which may have changed if the folder was
+                // renamed.
+                this._subfolderErrorDel.unregisterAll();
+            }
+
+            this.setAttribute("spinning", true);
+
+            var ds = gFolderService.get(this.fullname,
+                                        this._subfolderDataDel,
+                                        this._subfolderErrorDel);
+            ]]>
+        </method>
+
+        <!--- Clean up foldersummary error. -->
+        <method name="subfolderError" args="ds">
+            this.setAttribute("spinning", false);
+        </method>
+
+
+        <!--- Clean up all delegates and modes. 
+              @keywords private -->
+        <method name="destroy"><![CDATA[
+            this.cancelEditing();
+            this.cancelAutoOpenTimer();
+            LzTrack.unregister(this, 'folders');
+            if (this.selected) {
+                this.treesel.unselect(this);
+            }
+            if (this._subfolderDataDel != null) {
+                this._subfolderDataDel.unregisterAll();
+                this._subfolderDataDel = null;
+            }
+            if (this._subfolderErrorDel != null) {
+                this._subfolderErrorDel.unregisterAll();
+                this._subfolderErrorDel = null;
+            }
+            if (this._newmaildel != null) {
+                this._newmaildel.unregisterAll();
+                this._newmaildel = null;
+            }
+            super.destroy()
+            ]]>
+        </method>
+
+        <!--- @param Boolean nohilite: true if you don't want to show hilite.
+              @keywords private -->
+        <method event="onmouseover" name="domouseover">
+            if ( ! this['_spanel'] ) {
+                this._spanel = gFolderService.froot.immediateparent;
+            }
+            if (this._spanel['onmouseover']) {
+                this._spanel.onmouseover.sendEvent();
+            }
+
+            if (!selected) {
+                this.showHilite(true);
+            }
+            
+            this.setAttribute('_mouseisover', true);
+            gFolderSummary.setAttribute('folderover', this);
+        </method>
+
+
+        <!--- @param Boolean nohilite: true if you don't want to show hilite.
+              @keywords private -->
+        <method event="onmouseout" name="domouseout">
+            if ( ! this['_spanel'] ) {
+                this._spanel = gFolderService.froot.immediateparent;
+            }
+            if (this._spanel['onmouseout']) {
+                this._spanel.onmouseout.sendEvent();
+            }
+
+            if (!selected) {
+                this.showHilite(false);
+            }
+            this.setAttribute('_mouseisover',false);
+            gFolderSummary.setAttribute('folderover', null);
+        </method>
+
+
+        <!--- click on folder to select, start drag, start or start editing label
+              @keywords private -->
+        <method event="onmousedown"><![CDATA[
+            gFolderSummary.grabFocus();
+
+            if (this.dragable) checkdrag.apply();
+
+            if (this.clickToEditDelegate != null) {
+                this.clickToEditDelegate.unregisterAll();
+                this.clickToEditDelegate = null;
+            }
+
+            // If we're selected, and the x position is past the icon (over the text),
+            // and we're allowed to rename, and we're not already renaming,
+            // then start editing; else finish editing.
+            if (this.selected &&
+                (this.getMouse('x') >= this.foldernametext.x) &&
+                ! gFolderService.specialfolders[this.fullname] &&
+                this.clickToEditState == 0) {
+                this.clickToEditState = 1;
+                this.clickToEditDelegate = new LzDelegate(this, "onclickidle")
+                LzTimer.addTimer(this.clickToEditDelegate, this.clickToEditDelay);
+            } else {
+                this.commitEditing();
+            }
+          ]]>
+        </method>
+
+        <!--- @keywords private -->
+        <method event="onmouseup"><![CDATA[
+            var nonexistent = this.data.attributes['nonexistent'] == '1';
+
+            if (this.dragable) {
+                if (this.dragging) {
+                    canvas.folderdragger.stopdrag();
+                } else if (this._mouseisover && !nonexistent) {
+                    this.treesel.select(this);
+                }
+                checkdrag.remove();
+                this.dragging = false;
+            } else {
+                // If the user is currently editing a message,
+                // then we need to pop up a confirmation dialog,
+                // and return immediately without selecting.
+                // If the user clicks "yes" then we're called back to finally
+                // select this folder.
+                if (this._mouseisover && !nonexistent) {
+                    this.treesel.select(this);
+                }
+            }
+            ]]>
+        </method>
+
+        <!--- @keywords private -->
+        <method name="onclickidle"><![CDATA[
+            // If we're dragging, cancel the edit.
+            if (canvas.folderdragger.visible) {
+                this.clickToEditState = 0;
+            }
+            if (this.clickToEditState == 1) {
+                this.clickToEditState = 0;
+                this.startEditingName();
+            }
+          ]]>
+        </method>
+
+        <!--- @keywords private -->
+        <method name="startEditingName"><![CDATA[
+            if ( this.isSpinning() ) return;
+            if (!this.editingName) {
+                // FIXME: We should scroll into view now!
+                this.setAttribute("editingName", true);
+                this.editname.setAttribute("apply", true);
+            }
+            ]]>
+        </method>
+
+        <!--- Abort editing the name.
+              @keywords private -->
+        <method name="abortEditing">
+            this.stopEditing();
+            var data = this.data;
+            if (data == null) return;
+            if (data.attributes['nonexistent'] == '1') {
+                data.parentNode.removeChild(data);
+                gFolderService.onfolderlayoutchanged.sendEvent();
+            }
+        </method>
+
+
+        <!--- Stop editing the name.
+              @keywords private -->
+        <method name="stopEditing">
+            if (this['data'] == null || this.renameinprogress) return;
+            this.cancelEditing();
+        </method>
+
+
+        <method name="cancelEditing">
+            if (this.editingName) {
+                this.setAttribute("editingName", false);
+                this.editname.setAttribute("apply", false);
+            }
+            if (this.clickToEditDelegate != null) {
+                this.clickToEditDelegate.unregisterAll();
+                this.clickToEditDelegate = null;
+            }
+            gFolderSummary.grabFocus();
+        </method>
+
+
+        <!--- Commit name changes from editing the name.
+              @keywords private -->
+        <method name="commitEditing"><![CDATA[
+            if (!this.editingName || this.renameinprogress) return;
+
+            var oldName = this.displayname;
+            var newName = this.group.nameeditor.getText();
+            var newNameClean = "";
+
+            // Remove folder separators and other prohibited characters.
+            var changed = 0;
+            var allowed = gFolderService.allowedNameCharacters;
+            var n = newName.length;
+            var i;
+            for (i = 0; i < n; i++) {
+                var char = newName.substring(i, i + 1);
+                if (allowed.indexOf(char) >= 0) {
+                    newNameClean += char;
+                } else {
+                    changed = 1;
+                }
+            }
+
+            if (changed) {
+                newName = newNameClean;
+                this.group.nameeditor.setText(newName);
+            }
+
+            var nonexistent = this.data.attributes['nonexistent'] == '1';
+
+            if (nonexistent) {
+                if (newName == "") newName = oldName;
+            } else if ((newName == "") || (newName == oldName)) {
+                this.abortEditing();
+                return;
+            }
+
+            this.group.nameeditor.setAttribute("focusable", false);
+            this.group.nameeditor.setClickable(false);
+            LzFocus.setFocus(this);
+            this.setAttribute("spinning", true);
+
+            if (nonexistent) {
+                this.stopEditing();
+                newName = gUtil.trim(newName);
+                if (newName != '') {
+                    this.data.setAttr('name', newName);
+                    gFolderService.createFolder({
+                        parent: '',
+                        name: newName,
+                        target: gFolderService,
+                        nonexistentfolder: this
+                    });
+                } else {
+                    // remove folder with empty name.
+                    var data = this.datapath.p;
+                    data.parentNode.removeChild(data);
+                }
+            } else {
+                this.renameFolder(gUtil.trim(newName));
+            }
+            ]]>
+        </method>
+
+
+        <!--- Toggle the folder open/closed, if possible.
+              @keywords private -->
+        <method event="ondblclick">
+            this.cancelAutoOpenTimer();
+            this.clickToEditState = 0;
+            if (Number(this.subfoldercount) == 0) return;
+            this.toggleSubFolder();
+        </method>
+
+        <!--- @keywords private -->
+        <method event="onmousetrackover"><![CDATA[
+            if (this.subfoldercount > 0 && !this.opened) {
+                this.startAutoOpenTimer();
+            }
+            if (canvas.msgdragger.visible) {
+                var from = gMailService.currentfolder.fullname;
+                var dest = this.fullname;
+                if (from != dest) {
+                    this.showHilite(true);
+                 }
+            } else if (canvas.folderdragger.visible) {
+                this.showHilite(this.canAcceptDragFrom(canvas.folderdragger.source));
+            }
+          ]]>
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="startAutoOpenTimer">
+            this.cancelAutoOpenTimer();
+            this.autoOpenTimerDelegate = new LzDelegate(this, "onAutoOpenTimer");
+            LzTimer.addTimer(this.autoOpenTimerDelegate, this.autoOpenTimerDelay);
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="cancelAutoOpenTimer">
+            if (this.autoOpenTimerDelegate != null) {
+                LzTimer.removeTimer(this.autoOpenTimerDelegate);
+                this.autoOpenTimerDelegate = null;
+            }
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="onAutoOpenTimer">
+            this.cancelAutoOpenTimer();
+            this.openSubFolders();
+        </method>
+
+
+        <!--- @keywords private -->
+        <method event="onmousetrackout">
+            this.cancelAutoOpenTimer();
+            if (canvas.msgdragger.visible) {
+                this.showHilite(false);
+            } else if (canvas.folderdragger.visible) {
+                this.showHilite(false);
+            }
+        </method>
+
+
+        <!--- @keywords private -->
+        <method event="onmousetrackup"><![CDATA[
+            this.cancelAutoOpenTimer();
+
+            // Determine if it's a folder or a message.
+            if (canvas.msgdragger.visible && this.msgdroptarget) {
+
+                var from = gMailService.currentfolder.fullname;
+                var dest = this.fullname;
+                if ( ! gFolderService.froot.visible || from == dest ) {
+                    canvas.msgdragger.stopdrag();
+                } else {
+                    canvas.msgdragger.dropcomplete(this);
+                    canvas.msgdragger.stopdrag();
+
+                    // now move the message to new folder.
+                    // msgdragger.source should be a messagegridrow.
+                    this.moveMsgs(msgdragger.source);
+                } 
+
+            } else if (canvas.folderdragger.visible) {
+
+                var folderview = canvas.folderdragger.source;
+                if (this.canAcceptDragFrom(folderview)) {
+                    this.moveFolder(folderview.fullname, this.fullname, folderview, this);
+                }
+
+            }
+            ]]>
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="canAcceptDragFrom" args="folderview"><![CDATA[
+            // Reject dragging into a special folder, or the same folder as we're dragging.
+            if (!this.folderdroptarget || (this == folderview)) {
+                return false;
+            }
+
+            // Reject dragging if this or folderview is spinning. 
+            if (folderview.isSpinning() || this.isSpinning()) {
+                return false;
+            }
+
+            var myName = this.fullname;
+            var otherName = folderview.fullname;
+
+            // Reject dragging a folder into one of its children.
+            var sep = mailmodule.config.folderseparator;
+            if (myName.substring(0, otherName.length + 1) == (otherName + sep)) {
+                return false;
+            }
+
+            // Also reject dragging a folder into its direct parent (which is a no-op).
+            var lastSep = otherName.lastIndexOf(sep);
+            if (lastSep != -1 && (otherName.substring(0, lastSep) == myName)) {
+                return false;
+            }
+
+            return true;
+            ]]>
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="moveFolder" args="oldFullName, newParentFullName, oldFolderView, newFolderView"><![CDATA[
+            if (canvas.folderdragger.visible) {
+                canvas.folderdragger.dropcomplete(this);
+                canvas.folderdragger.stopdrag();
+            }
+
+            var args = {
+                sourceName   : oldFullName,
+                targetName   : newParentFullName,
+                oldFolderView: oldFolderView,
+                newFolderView: newFolderView,
+                target       : this               // callback target
+            };
+
+            gFolderService.moveFolder(args);
+            ]]>
+        </method>
+
+        <!--- @keywords private -->
+        <method name="moveFolderFail" args="oldFolderView, newFolderView, oldName, newName">
+            if (oldFolderView) oldFolderView.setAttribute("spinning", false);
+            if (newFolderView) newFolderView.setAttribute("spinning", false);
+            gDialogMan.showAlert("Error moving folder '" + oldName + "' to '" 
+                                 + newName + "'.\n",
+                                 gMail.parent,
+                                 new LzDelegate(gFolderSummary, 'grabFocus'));
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="moveFolderSucceed" args="oldFolderView, newFolderView, oldName, newName">
+            <![CDATA[
+            if (oldFolderView) oldFolderView.setAttribute("spinning", false);
+            if (newFolderView) newFolderView.setAttribute("spinning", false);
+                                 
+            var sep = mailmodule.config.folderseparator;
+            var oldParent = oldName.substring(0, oldName.lastIndexOf(sep));
+            var newParent = newName.substring(0, newName.lastIndexOf(sep));   
+            
+            var oldShortName = oldName.substring(oldName.lastIndexOf(sep)+1); 
+            var newShortName = newName.substring(newName.lastIndexOf(sep)+1); 
+                                                    
+            gFolderService.renameExpandedFolder(oldParent, oldShortName, 
+                                                newParent, newShortName);
+
+            gFolderService.invalidateSubFolders(oldName);
+
+            var oldParentReq = gFolderService.find(oldParent);
+            var newParentReq = gFolderService.find(newParent);
+
+            var oldParentNode = gFolderService.findSub(oldParent);
+            var newParentNode = gFolderService.findSub(newParent);
+
+            var selectionPath = newName;
+            if (this.treesel.selectionName == oldName) {
+
+                // The folder we're dropping is selected. Handle special cases.
+                if ( newFolderView && ! newFolderView.opened ) {
+                    // Dropping into a closed parent folder, so select the parent.
+                    this.treesel.select(newFolderView);
+                } else {
+                    // Arrange for the view to be selected when created.
+                    this.treesel.selectName(newName); 
+                }
+            }
+
+            var cnodes = oldParentReq.result.childNodes;
+            for (var i = 0; i < cnodes.length; i++) {
+                var child = cnodes[i];
+
+                if (child.attributes.name == oldName) {
+                    oldParentReq.result.removeChild(child);
+
+                    var oldSubFolderCount = 0;
+                    if (oldParentNode) {
+                        oldSubFolderCount = Number(oldParentNode.attributes.subfoldercount) - 1;
+                    }
+                    if (oldParentReq) {
+                        oldSubFolderCount = Number(oldParentReq.result.attributes.subfoldercount) - 1;
+                    }
+
+                    if (oldParentNode) {
+                        oldParentNode.setAttr("subfoldercount", oldSubFolderCount);
+                    }
+                    if (oldParentReq) {
+                        oldParentReq.result.setAttr("subfoldercount", oldSubFolderCount);
+                    }
+
+                    child.setAttr('fullname', newName);
+                    child.setAttr('name', newName.substring(newName.lastIndexOf(sep) + 1));
+
+                    var newSubFolderCount = 0;
+                    if (newParentNode) {
+                        newSubFolderCount = Number(newParentNode.attributes.subfoldercount) + 1;
+                    }
+                    if (newParentReq) {
+                        newSubFolderCount = Number(newParentReq.result.attributes.subfoldercount) + 1;
+                    }
+
+                    if (newParentNode) {
+                        newParentNode.setAttr("subfoldercount", newSubFolderCount);
+                    }
+                    if (newParentReq) {
+                        newParentReq.result.setAttr("subfoldercount", newSubFolderCount);
+                        newParentReq.result.appendChild(child);
+                    }
+
+                    gFolderService.sortSubFolders(newParent);
+                    break;
+                }
+            }
+
+            gFolderService.onfolderlayoutchanged.sendEvent();    
+            ]]>
+        </method>
+
+
+        <!--- Rename this folder to a new name -->
+        <method name="renameFolder" args="newName"><![CDATA[
+            newName = gUtil.trim(newName);
+            if (newName == '') {
+                this.abortEditing();
+                return;
+            }
+
+            // FIXME: [gse 2005-03-15] As with moveFolder, there's a number of params that
+            //        the API doesn't use anymore, but that are used in the "success" handler.
+            //        These should be refactored at some point to clean up the code.
+            var parent = "";
+            var oldFullName = this.fullname;
+            var oldName = oldFullName;
+            var lastSep = oldFullName.lastIndexOf(mailmodule.config.folderseparator);
+            if (lastSep != -1) {
+                parent = oldFullName.substring( 0, lastSep);
+                oldName = oldFullName.substring( lastSep + 1, oldFullName.length);
+            }
+
+            var args = {
+              'parent'  : parent,  // not needed by API anymore
+              'oldName' : oldName, // not needed by API anymore
+              'newName' : newName, // not needed by API anymore
+              'sourceName' : this.fullname,
+              'targetName' : newName,
+              'target'     : this
+            };
+
+            gFolderService.renameFolder(args);
+            this.renameinprogress = true;
+
+            ]]>
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="renameFolderFail" args="args">
+            setAttribute("spinning", false);
+            this.renameinprogress = false; 
+            this.abortEditing();           
+            if(args.oldName != args.newName){
+                gDialogMan.showAlert("Error renaming folder '" + args.oldName
+                                         + "' to '" + args.newName + "'.\n", 
+                                         gMail.parent, 
+                                         new LzDelegate(this, 'startEditingName'));  
+            }
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="renameFolderSucceed" args="args"><![CDATA[
+            var parent = args['parent'];
+            var oldName = args['oldName'];
+            var newName = args['newName'];
+
+            setAttribute("spinning", false);
+            this.renameinprogress = false;
+
+            gFolderService.renameExpandedFolder(parent,oldName,parent,newName);
+
+            this.flushSubFolders();
+
+            var sep = mailmodule.config.folderseparator;
+            var oldPath = oldName;
+            var newPath = args.newName;
+
+            if (parent && parent != "") {
+                oldPath = parent + sep + oldPath;
+                newPath = parent + sep + newPath;
+            }
+
+            gFolderService.invalidateSubFolders(oldPath);
+
+            var parentReq = gFolderService.find(parent);
+
+            var cnodes = parentReq.result.childNodes;
+            for (var i = 0; i < cnodes.length; i++) {
+                if (cnodes[i].attributes.name == oldName) {
+                    cnodes[i].setAttr('name', newName);
+                    cnodes[i].setAttr('fullname', newPath);
+                    break;
+                }
+            }
+
+            this.updateExpansion();
+
+            gFolderService.sortSubFolders(parent);
+
+            this.stopEditing();
+
+            // Select the view when it exists.
+            this.treesel.selectName(newPath);
+
+            // Redo the layout so the view gets selected.
+            gFolderService.onfolderlayoutchanged.sendEvent();
+            ]]>
+        </method>
+
+
+        <!--- To move a message from the current folder to this folder,
+              this calls the server to execute the command, and updates local data
+              so that the message counts appear correctly.
+              This code path also implements marking a message as junk. 
+              @param msgview messagegridrow: the row of the message dragged into this folder.
+        -->
+        <!--- Move messages into this folder. -->
+        <method name="moveMsgs" args="msgRow"><![CDATA[
+            var mgrid = gMailService.mgrid;
+            var selector = mgrid.selector;
+            var items = selector.selected;
+
+            if (items == null || items.length == 0) {
+                if (msgRow) {
+                    selector.select(msgRow);
+                }
+            }
+
+            var srcFolder = gMailService.currentfolder;
+            var dstFolder = gMailService.getFolder(this.fullname);
+            
+            if (srcFolder.fullname == dstFolder) return;
+
+            // mgrid selector should be the same as srcFolder's selector.
+            srcFolder.moveMsgs(dstFolder);
+
+            mgrid.selectNext();
+            ]]>
+        </method>
+
+
+        <!--- this overrides the baselistitem's setSelected method
+              (Not any more because we no longer extend baselistitem.)
+              I don't call super to save a bit of performance,
+              since this does all it needs to do
+              note: this method is guaranteed
+              to be called after all subviews are initialized
+              @param boolean s: selected flag
+              @keywords private -->
+        <method name="setSelected" args="s"><![CDATA[
+            // NOTE: Sometimes this gets called by the selection manager, after
+            // this view has been deleted. Need to deselect before destroying.
+            // NOTE: This gets called before oninit event is delivered,
+            // on the INBOX folder reference in
+            // gMailService.getFolder(mailmodule.config.inboxfolder).folderview.
+            // So sometimes the 'data' field is not defined, either.
+
+            this.selected = s;
+            if (!isinited) return;
+
+            if ( s ) {
+                this.showHilite(true);
+
+                var searchFolder = gFolderSummary.scrollsubpanel.searchFolder;
+                if (searchFolder.selected) {
+                    searchFolder.setSelected(false)
+                }
+
+                if (gMail.firstrequest && 
+                    this.fullname == mailmodule.config.inboxfolder) {
+                    gMail.firstrequest = false;
+                } else if (this.data == null || 
+                           this.data.attributes['nonexistent'] != '1') {
+                    gMailService.fetchFolder(this.fullname);
+                }
+
+            } else {
+                this.showHilite(this._mouseisover ? true : false);
+            }
+            ]]>
+        </method>
+
+
+        <!--- this is called by baselist to show the hilite on arrow keys
+             @param boolean hilited: hilited flag
+             @keywords private -->
+        <method name="setHilite" args="hilited">
+            if (! this.selected) this.showHilite(hilited);
+        </method>
+
+
+        <method name="showHilite" args="hilited">
+            if (this.selected) {
+                this.hilite.setAttribute('frame',3);
+            } else if (hilited) {
+                this.hilite.setAttribute('frame',2);
+            } else {
+                this.hilite.setAttribute('frame',1);
+            }
+        </method>
+
+
+        <!--- @keywords private -->
+        <method name="getSelection">
+            return this.treesel.getSelection();
+        </method>
+
+        <!--- @return true if this folder or an ancestor is spinning. -->
+        <method name="isSpinning">
+            if (this.spinning) return true;
+            // parent is flist, parent.parent is folder (or folder root)
+            var pp = parent.parent;
+            while ( pp instanceof folder ) {
+                if (pp.spinning) return true;
+                pp = pp.parent.parent;
+            }
+            return false;
+        </method>
+
+    </class>
+
+
+</library>

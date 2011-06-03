@@ -1,0 +1,54 @@
+
+# Filename: XCStubs.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include ZloBase
+  
+start
+  py ALL['[=..=]'].moves = {}
+
+#making a stub will automatically invoke a finish transform
+#to move all 'markForMove' nodes to that stub
+@moveStub 
+  evaluate [=.name=] '[=0=]'
+  py ALL['[=..=]'].moves[[=.name=]] = True
+  new [=0=]_stub
+  
+#wrap inner nodes to be moved at the end of processing the dom..
+@markForMove
+  new [=0=]_collected
+    pass
+    
+@collectionStub
+  new [=0=]_stub
+
+@targetStub
+  evaluate [=.name=] '[=0=]_stub'
+  py
+    [=.stubelem=] = DOC.getElementsByTagName([=.name=])
+    if [=.stubelem=]:
+      [=.stubelem=] = [=.stubelem=][0]
+      [=.targetTag=] = [=.stubelem=].parentNode.insertBefore(PARSE('<[=1=]/>'), [=.stubelem=])
+      [=.stubelem=].parentNode.removeChild([=.stubelem=]).unlink()
+    else:
+      raise "Stub invoked but not defined: %s"%[=.name=]
+  context now [=.targetTag=]
+    
+finish
+  #move all elements marked to move to their respective XCStubs.
+  py 
+    moves = ALL['[=..=]'].moves
+    for stubmade in moves.keys():
+      stubname = "%s_stub"%(stubmade)
+      tagname = "%s_collected"%(stubmade)
+      stubelem = DOC.getElementsByTagName(stubname)
+      if stubelem:
+        stubelem = stubelem[0]
+        for entry in DOC.getElementsByTagName(tagname):
+          [stubelem.parentNode.insertBefore(x.cloneNode(deep=True), stubelem) for x in entry.childNodes]
+          entry.parentNode.removeChild(entry).unlink()
+        stubelem.parentNode.removeChild(stubelem).unlink()
+
+
+

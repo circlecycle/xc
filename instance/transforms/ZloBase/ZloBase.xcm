@@ -1,0 +1,405 @@
+
+# Filename: ZloBase.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include std
+
+start
+  Object [~..waypoint~], node
+    initstage early
+    string at,
+    string named,
+    def construct, p, a
+      //NOTE "this node" means the parent of this tag 
+      var at = a['at'];
+      var named = a['named']
+      var np = at ? eval(at) : p.immediateparent;
+      //find out which node will receive the new waypoint
+      while(1){
+          //have we found a potential parent waypoint or have an "at" operation?
+          if(at || np['parentwaypoint'] || np['id'] || np.nodeLevel == 0){
+              //initialize space to hold waypoints if this is new.
+              if(np['_'] == undefined) np._ = {};
+              //if no name given make a name based on the number of other nameless waypoints
+              //otherwise ensure the name doesn't overwrite anything in the target waypoint space.
+              if(!named){
+                  // if __waypointCount is not defined initialize it to zero, otherwise increment
+                  np.__waypointcount = np['__waypointcount'] != undefined ? np.__waypointcount + 1 : 0;                       
+                  // and use value that to generate a unique name
+                  named = "__waypoint"+np.__waypointcount;
+              }else if(np._[named] != undefined){
+                  Debug.warn('waypoint overwritten:', np, 'name', named);
+              } 
+              //Add this node to a waypoint, add the waypoint to this node, then break
+              np._[named] = p;
+              p.parentwaypoint = np;
+              break;
+          }
+          //or just keep looking up the tree until we find a good target.
+          np = np.immediateparent;
+      }
+      //we don't need the tag anymore, it's done it's job (cyclic GC? investigate)
+      super.construct();
+
+#)common elements
+@name         set name
+@id           set id
+@waypoint     
+  new  [~..ZloBase.waypoint~]
+    set named [=?ARGV[0]=]
+    set at [=?ARGV[1]=]
+    
+@view         new view
+@obj          new
+@clipview
+  view
+    clip
+@disp   
+  view
+    fullsize
+    pass
+@viewname     new view set name
+@viewimg      new view set resource
+@viewid       new view set id
+@viewdata     new view set datapath    
+@vert
+  view
+    valign [=ARGV[0]=]
+=vert 0
+@horiz
+  view
+    halign [=ARGV[0]=]
+=horiz 0
+@hbox 
+  new hbox 
+    set spacing [=?ARGV[0]=]
+@vbox 
+  new vbox 
+    set spacing [=?ARGV[0]=]
+@middle       set valign middle
+@center       set align center
+@align        set align
+@centered     
+  middle
+  center
+@txt          
+  new text set text [=ARGV=]   
+    set resize true
+    
+@ctxt          
+  new text set text [=''.join(ARGV[1:])=] 
+    fgcolor [=0=]
+    set resize true
+=ctxt 0xffffff
+
+@mtxt new text attr multiline="true", resize="true"
+    
+@fonttxt
+  txt [=''.join(ARGV[2:])=]
+    font [~..[=0=]~]
+    fontsize [=1=]
+    
+@shadowtxt
+  view
+    set valign middle
+    viewxy 2,2
+      name top
+      fgcolor 0x444444
+      new text set text [=''.join(ARGV[1:])=]   
+        name field
+        set resize true
+    view
+      name bottom
+      fgcolor [=0=]
+      new text set text [=''.join(ARGV[1:])=]   
+        set resize true
+    pass
+    
+@imgwh
+  viewimg [=''.join(ARGV[1:])=]
+    wh [=0=], [=0=]
+    stretch
+    
+
+    
+@fontview
+  new view set fontsize [=0=]
+    group FontGroup
+    
+=fontview 16
+
+@usefont set font [=ARGV.replace('.', '_')=]
+@useimg set resource [=ARGV.replace('.', '_')=]
+
+@edittext 
+  new edittext
+    set value [=?0=]
+
+#)UI Elements
+@menubar      
+  new menubar set width [=0=]
+    pass
+@menu         
+  new menu set text [=0=]    
+    pass
+@menuitem     
+  new menuitem set text [=0=]
+    pass
+    
+@scrollview
+  clipview
+    [=contains=]
+  scroll y
+
+@tabs         
+  new tabs
+    pass
+@tabpane      
+  new tabpane set text [=0=]
+    pass
+  
+#)scripting
+
+@string
+  new attribute 
+    set name [=0=]
+    set type string    
+    set value [=?ARGV[1]=]
+
+@number
+  new attribute 
+    set name [=0=]
+    set type number    
+    set value [=?ARGV[1]=]
+
+@expr
+  new attribute 
+    set name [=0=]
+    set type expression    
+    set value [=?ARGV[1]=]
+    
+@bool 
+  new attribute 
+    set name [=0=]
+    set type boolean    
+    set value [=?ARGV[1]=]
+
+@method       
+  new method 
+    set name [=?name=]
+    set id [=?id=]
+    set args [=?args=]
+    set event [=?event=]
+    text
+      [=contains=]
+      
+@def       
+  new method 
+    set name [=ARGV[0]=]
+    set args [=?','.join(ARGV[1:])=]
+    text
+      pass
+      
+@function new method set id    
+@args         
+  set args
+    pass
+@extends set extends 
+@debug text Debug.write([=0=]);
+
+@viewxy        
+  new view 
+    xy [=0=], [=1=]
+@viewwh        
+  new view 
+    wh [=0=], [=1=]
+@width set width
+@height set height
+
+@wh
+  set width [=0=]
+  set height [=1=]
+  
+@x set x
+@y set y
+@xywh
+  xy [=0=], [=1=]
+  wh [=2=], [=3=]
+@xy
+  set x [=0=]
+  set y [=1=]
+@whof
+  set width ${[=0=].width}
+  set height ${[=0=].height}
+@xyof
+  set x ${[=0=].x}
+  set y ${[=0=].y}
+@xyofminus xy ${[=0=].x-[=1=]}, ${[=0=].y-[=1=]}
+@hof     
+  set height ${[=0=].height}
+@wof      
+  set width ${[=0=].width}
+
+@woftext width ${[=0=].getTextWidth()}
+@hoftext height ${[=0=].getTextHeight()} 
+@whoftext wh ${[=0=].getTextWidth()}, ${[=0=].getTextHeight()}
+@woftextplus width ${[=0=].getTextWidth()+[=1=]}
+@hoftextplus height ${[=0=].getTextHeight()+[=1=]} 
+@whoftextplus wh ${[=0=].getTextWidth()}, ${[=0=].getTextHeight()+[=1=]}
+@woftextminus width ${[=0=].getTextWidth()-[=1=]}
+@hoftextminus height ${[=0=].getTextHeight()-[=1=]} 
+@whoftextminus wh ${[=0=].getTextWidth()}, ${[=0=].getTextHeight()-[=1=]}
+@wofminus width ${[=0=].width-[=1=]}
+@hofminus height ${[=0=].height-[=1=]}
+@whofminus wh ${[=0=].width-[=1=]}, ${[=0=].height-[=1=]}
+@wofplus width ${[=0=].width+[=1=]}
+@hofplus height ${[=0=].height+[=1=]}
+@whofplus wh ${[=0=].width+[=1=]}, ${[=0=].height+[=1=]}
+
+  
+@margin xywh [=0=], [=0=], ${parent.width-([=0=]*2)}, ${parent.height-([=0=]*2)}
+@marginxy xywh [=1=], [=2=], ${[=0=].width-([=1=]*2)}, ${[=0=].height-([=2=]*2)}
+
+@scroll        
+  new scrollbar set axis [=0=]
+    set disabledbgcolor 0xbbbbbb
+=scroll y
+@fullsize wh ${parent.width}, ${parent.height}
+@fullview
+  view
+    fullsize
+
+#) Classes
+
+@Object
+  init block
+    new class
+      set name [=0=]
+      set extends [=?1=]
+    
+@Class
+  init block
+    new class
+      set name [=name=]
+      set extends [=extends=]
+      Parameters
+        entries:
+          [=params=]
+      [=contains=]
+
+=Class
+  name: DummyClass
+  extends: view
+  params:
+    string: None
+  contains: 
+    txt Hi there
+  
+@Parameters
+  loop [=.entry=] in [=`entries`=]    
+    py [=.names=] = [x.strip() for x in [=.entry=].split(':')]
+    makeParameters [~[=.names=][0]~], [~[=.names=][1]~]
+    
+#boolean | color | expression | number | size | string | text | html | script?
+@makeParameters new fragment using ZloBase.makeParameters
+    
+#)events
+@onclick       prepend onclick
+@ondblclick    prepend ondblclick
+@onmouseover   prepend onmouseover
+@onmouseout    prepend onmouseout
+@onmousedown   prepend onmousedown
+@onmouseup     prepend onmouseup
+@oninit        prepend oninit
+@ondata        prepend ondata
+@onblur        prepend onblur
+@onselect      prepend onselect
+@onconstruct   prepend onconstruct
+
+@event         
+  new method set event [=0=]
+    text
+      pass  
+      
+@eventname         
+  new method 
+    set event [=1=]
+    set name  [=0=]
+    text
+      pass
+      
+@eventid      
+  new method 
+    set event [=1=]
+    set id  [=0=]
+    text
+      pass 
+   
+@handler
+  new handler set name [=0=]
+    pass
+    
+@on
+  new handler 
+    set name on[=0=]
+    set args [=?','.join(ARGV[1:])=]
+    text
+      pass
+      
+#)effects
+@opacity         set opacity        
+@visible         set visible
+@bgcolor         set bgcolor
+@fgcolor         set fgcolor
+@gradient        new drawview using zlo_draw.gradient %% colorpairs=[[[=`0`=], [=`1`=]],  [[=`2`=], [=`3`=]]] 
+@rollover        new fragment using ZloEffects.colorTransformRollover
+@initTint        call ZloEffects.initTint
+@stretch         set stretches [=0=]
+=stretch both
+@drag            new dragstate set name
+@draggable       new fragment using ZloEffects.draggable
+@resize          new resizestate set name
+@animate         text this.animate('[=0=]', [=1=], [=2=], false);
+@clip            set clip true
+@rotation        set rotation
+      
+#)layout   
+@halign        
+  new simplelayout set axis x
+    set spacing [=0=]
+=halign 0
+@valign        
+  new simplelayout set axis y
+    set spacing [=0=]
+=valign 0
+       
+#)resources
+@img set resource
+
+@loadResource
+  init block
+    new resource 
+      set name [=0=]
+      set src [=1=]
+      
+@loadFont
+  init block
+    new font 
+      set name [=0=]
+      set src [=1=]
+      
+@font set font
+@fontsize set fontsize
+@fontstyle set fontstyle
+
+@initstage set initstage 
+@clickable set clickable
+@multiline set multiline true
+@enabled set enabled
+@datapath set datapath
+@doesenter set doesenter
+@selectable set selectable true
+@spacing set spacing
+@radiogroup new radiogroup
+@radiobutton new radiobutton

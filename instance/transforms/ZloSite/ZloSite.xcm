@@ -1,0 +1,141 @@
+
+# Filename: ZloSite.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include ZloUI
+
+start
+  loadResource [=..desktop1icon=], icons/window2.png
+
+#screen frames! 
+
+@Pane
+  Desktop
+    id: [=id=]
+    moveto: [=belongs=]
+    security: [=?security=]
+    dataset: [=belongs=]
+    minimized: [=?minimized=]
+    icon: [=..desktop1icon=]
+    title: [=title=]
+    contains:
+      [=contains=]
+
+#a three pane layout makes a title bar, a "switcher", and allows the invokation of N panes to be included
+#via the "belongs" id      
+@ThreePaneLayout
+  Desktop
+    id: [=id=]
+    title: [=title=]
+    security: [=?security=]
+    minimized: [=?minimized=]
+    contains:
+      clipview
+        fullsize
+        valign 10
+        ZloUI.roundview
+          h: [=topheight=]
+          margin: [=topmargin=]
+          box:
+            fgcolor [=topcolor=]
+            opacity [=opacity=]
+          contains:
+            [=top=]
+    
+        view
+          fullsize
+          halign 10
+          ZloUI.roundview
+            w: [=leftwidth=]
+            h: ${parent.height-[=topheight=]-10}
+            margin: [=leftmargin=]
+            box:
+              fgcolor [=leftcolor=]
+              opacity [=opacity=]
+            contains:
+              vert 20
+                wof parent
+                middle
+                DesktopSwitcher
+                  wof parent
+                  center
+                  datapath [=belongs=]:/desktop
+                  set iconsize [=iconsize=]
+                  set minimized $path{'@minimized'}
+        
+          ZloUI.roundview
+            w: ${parent.width-[=int(leftwidth)+10=]}
+            h: ${parent.height-[=topheight=]-10}
+            box:
+              fgcolor [=maincolor=]
+              opacity [=opacity=]
+            contains:
+              moveStub [=belongs=]
+          
+=ThreePaneLayout
+  opacity: 0.55
+  topheight: 75
+  topmargin: 20
+  topcolor: 0xdddddd
+  leftwidth: 100
+  leftcolor: 0xddddff
+  leftmargin: 20
+  iconsize: 30
+  maincolor: 0xdddddd
+      
+      
+#a three pane layout makes a title bar, a "switcher", and allows the invokation of N panes to be included
+#via the "belongs" id      
+@ThreePaneVerticalLayout
+  ZloUI.Desktop
+    id: [=id=]
+    title: [=title=]
+    security: [=?security=]
+    minimized: [=?minimized=]
+    contains:
+      clipview  
+        fullsize
+        valign 10
+        ZloUI.roundview
+          h: [=topheight=]
+          margin: [=topmargin=]
+          box:
+            fgcolor [=topcolor=]
+            opacity [=opacity=]
+          contains:
+            [=top=]
+    
+        ZloUI.roundview
+          h: [=middleheight=]
+          box:
+            fgcolor [=middlecolor=]
+            opacity [=opacity=]
+          contains:
+            fullsize
+            horiz 10
+              centered
+              DesktopSwitcher
+                datapath [=belongs=]:/desktop
+                set iconsize [=iconsize=]
+                set minimized $path{'@minimized'}
+        
+        ZloUI.roundview
+          h: ${parent.height-[=int(topheight)+int(middleheight)+20=]}
+          box:
+            fgcolor [=maincolor=]
+            opacity [=opacity=]
+          contains:
+            moveStub [=belongs=]
+          
+=ThreePaneVerticalLayout
+  opacity: 0.55
+  topheight: 75
+  topmargin: 20
+  topcolor: 0xdddddd
+  middleheight: 40
+  middlecolor: 0xccccff
+  iconsize: 30
+  maincolor: 0xdddddd
+  
+      

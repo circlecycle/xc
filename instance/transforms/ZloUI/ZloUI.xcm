@@ -1,0 +1,1385 @@
+
+
+# Filename: ZloUI.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include XCStubs, ZloEffects, ZloData, std, ZloBase, ZloWidgets
+skin ZloUI
+#skin graphical
+
+start
+  script
+    var [=..lastModalShown=] = false;
+    var [=..lastModalIconShown=] = false;
+    var [=..lastx=] = 0;
+    var [=..lasty=] = 0;
+    
+    function changeVirtual(destx, desty){
+      if([=..lastx=] == destx){
+        if([=..lasty=] == desty){return false;}
+      }
+      [=..master=].animate('x', ([=..lastx=]-destx)*canvas.width, 500, true);
+      [=..master=].animate('y', ([=..lasty=]-desty)*canvas.height, 500, true);
+      [=..lastx=] = destx;
+      [=..lasty=] = desty;
+    }
+    
+  new dataset set name [=..GlobalSettings=]
+    new activewindow
+      set id null
+      set title Home Page
+
+  loadFont     [=..axelrod=],       fonts/AXLEROD3.TTF
+  loadFont     [=..badtimes=],      fonts/BADTIME1.TTF
+  loadFont     [=..foursticks=],    fonts/4STICK10.TTF
+  loadFont     [=..communicate=],   fonts/COMMUN38.TTF
+  loadFont     [=..blackdog=],      fonts/BLKDOG15.TTF
+  
+
+  #Backgrund Image
+  loadResource [=..Background=],      [=$Background=]
+
+  #various UI (non class-included) images
+  #loadResource [=..metal=],         metal.jpg
+  #loadResource [=..left=],          icons/1leftarrow.png
+  #loadResource [=..right=],         icons/1rightarrow.png
+  #loadResource [=..up=],            icons/1uparrow.png
+  #loadResource [=..down=],          icons/1downarrow.png
+  
+  loadResource [=..GlassBar=],      [=$GlassBar=]
+  loadResource [=..GlassBarL=],     [=$GlassBarL=]
+  loadResource [=..GlassBarR=],     [=$GlassBarR=]
+  loadResource [=..menubck1=],      osxwin/menus/menu1/background.png
+  loadResource [=..winbacking=],    [=$WindowBacking=]
+  loadResource [=..VMIcon=],        [=$VirtualManagerIcon=]
+  
+  initTint [=..NoTint=], 0, 0, 0
+  
+  initTint [=..ActiveWinTint=], [=$ActiveWinTint=]
+  initTint [=..ActiveSysTrayTint=], [=$ActiveSysTrayTint=]
+  
+  initTint [=..TaskBarTint=], [=$TaskBarTint=]
+  initTint [=..TaskBarDownTint=], [=$TaskBarDownTint=]
+    
+  makeImageStretchBorderResizeableClass
+    name: [=..osxwin=]
+    border: 14
+    innercolor: 0xD6D6DD
+    tl: osxwin/newstyle/tl.png
+    tr: osxwin/newstyle/tr.png
+    bl: osxwin/newstyle/bl.png
+    br: osxwin/newstyle/br.png
+    t:  osxwin/newstyle/t.png
+    r:  osxwin/newstyle/r.png
+    b:  osxwin/newstyle/b.png
+    l:  osxwin/newstyle/l.png
+    
+  makeImageStretchBorderClass
+    name: [=..osxwininner=]
+    border: 11
+    innercolor: 0xD6D6DD
+    tl: osxwin/inner/tl.png
+    tr: osxwin/inner/tr.png
+    bl: osxwin/inner/bl.png
+    br: osxwin/inner/br.png
+    t:  osxwin/inner/t.png
+    r:  osxwin/inner/r.png
+    b:  osxwin/inner/b.png
+    l:  osxwin/inner/l.png
+  
+  makeWindowClass
+    name: [=..window=]
+    
+  makeModalClass
+    name: [=..modal=]
+    
+  makeSysTrayClass
+    name: [=..SysTrayIcon=]
+    
+  makeVMWindowClass
+    name: [=..vmwindow=]
+    color: 0x111155
+    highlight: 0x1111ff
+    textbackground: 0x000000
+    textcolor: 0xffffff
+    
+  makeVirtualMonitorsClass
+    name: [=..virtualmonitors=]
+    color: 0x999999
+    highlight: 0xee9c88
+    
+  makeStartBarClass
+    name: [=..StartBar=]
+    
+  makeLoginPane
+    name: [=..LoginPane=]
+    
+  makeMenuClass
+    name: [=..menu=]
+    background: osxwin/menus/menu1/background.png
+    
+  loadResource [=..sideTabMiddle=], tabs/tab1middle.png
+  makeSideTabClass
+    name: [=..sideTab=]
+    top:    tabs/tab1topchop.png
+    middle: tabs/tab1middle.png
+    bottom: tabs/tab1bottomchop.png
+    
+  makeDesktopShellClass
+    name: [=..DesktopShell=]
+    
+  makeDesktopSwitcherIconsClass
+    name: [=..DesktopSwitcherIcons=]
+    
+  makeDesktopSwitcherTextClass
+    name: [=..DesktopSwitcherText=]
+    
+  makeMessageDialogClass
+    name: [=..messageDialog=]
+    
+  makeMessageModalClass
+    name: [=..messageModal=]
+    
+  makeSimpleWindowClass
+    name: [=..SimpleWindow=]
+
+#)
+#)        STRUCTURE
+#)
+    
+#)Paints the full GUI
+@INIT
+  #)on init actions (overlay fade out, for one..)
+  view
+    set initstage late
+    #[=..introOverlay=].animate('opacity', 0, 4000);
+    on init
+      [=..SystemMessage=].display('Welcome to the LzXC Environment');
+      
+  #)Desktop Background
+  view
+    whof canvas
+    opacity [=$BackgroundOpacity=]
+    stretch both
+    bgcolor black
+    img [=..Background=]
+    
+  #)Background Icon (optional)
+  #view
+  #  opacity 0.2
+  #  xy ${canvas.width/2-this.width/2}, ${canvas.height/2-this.height/2}
+  #  img [=..BackgroundIcon=]
+  
+  #)python/openlaszlo powered logo
+  view
+    xywh 5, ${canvas.height-this.height-5}, 25, 185
+    opacity 0.7
+    roundbox
+      fgcolor white
+      opacity 0.7
+    vbox 20
+      wof parent
+      height ${parent.height-20}
+      middle
+      stretch both
+      
+      loadResource [=..pythonpowered=],    icons/python-vert.png
+      loadResource [=..laszlopowered=],    icons/laszlo.png
+      
+      viewimg [=..laszlopowered=]
+        opacity 0.4
+        onclick LzBrowser.loadURL('http://www.openlaszlo.org', '_blank');
+        animateover this, opacity, 0.4, 1, 300
+      viewimg [=..pythonpowered=]
+        opacity 0.4
+        onclick LzBrowser.loadURL('http://python.org', '_blank');
+        animateover this, opacity, 0.4, 1, 300
+    
+  #)Main Desktop Area (moved by the VirtualMonitors)
+  viewxy 0, 25
+    id [=..master=]
+    fullsize
+    #)Desktop Apps (Simple/Normal)
+    view
+      marginxy canvas, 35, 20
+      moveStub [=..DesktopArea=]
+    #)Windowed Apps
+    moveStub [=..WindowsArea=]
+    
+  #)Start Bar Area
+  view
+    height 25
+    font [=..ZloUI.foursticks=]
+    fontsize 18
+  
+    #)Start Bar Background
+    shadow
+      hof parent
+      width ${canvas.width+20}
+      opacity 0.3
+      xy -10, 8
+    viewimg [=..GlassBar=]
+      stretch width
+      width ${canvas.width}
+    
+    #)StartBar Content
+    horiz
+      #?Active Windows Content
+      StartBarStructure
+      
+    #)SysTray Content
+    view
+      middle
+      set x ${canvas.width-this.width-5}
+      halign 5
+      #)SysTray Items
+      SysTrayStructure
+      
+  #)Simple (not managed at all!) Desktops
+  view
+    id [=..SimpleDesktops=]
+    moveStub [=..SimpleDesktopArea=]
+      
+  #)Tabs Area
+  viewimg [=..sideTabMiddle=]
+    id [=..sideTabSize=]
+    visible false
+  vert
+    xy ${(canvas.width)}, 30
+    width ${[=..sideTabSize=].resourcewidth}
+    moveStub [=..SideTabsArea=]
+      
+  #)Modal Area
+  viewxy 0, 26
+    wh ${canvas.width}, ${canvas.height-26} 
+    view
+      marginxy parent, 10, 10
+      #xywh 20, 52, ${canvas.width-40}, ${canvas.height-78}
+      moveStub [=..ModalsArea=]
+    
+  #)Plain Modals Area
+  viewxy 0, 25
+    moveStub [=..ModalsPlainArea=]
+    
+  #)Virtual Monitors
+  viewxy 0, -200
+    opacity 0
+    id [=..vmdisplay=]
+    new [=..virtualmonitors=]
+      xy ${canvas.width-(this.width*2)}, 0
+      wh ${canvas.width/8}, ${canvas.height/8}
+    
+  #)Full Screens
+  view
+    moveStub [=..FullScreenArea=]
+  
+  
+  #)Builtin System Components
+  #? Built in system modals for day to day tasks  
+  
+  ZloUI.SystemModal
+    id: [=..HelpTray=]
+    title: Help and Usage
+    icon: [=$HelpTrayIcon=]
+    contains:
+      ctxt white, General Help Here
+      
+  ZloUI.SystemModal
+    id: [=..UsersGroupsTray=]
+    title: Administration: Users and Groups
+    icon: [=$UsersGroupsTrayIcon=]
+    security: admin
+    contains:
+      new view using ZloACL.interface
+      
+  ZloUI.SystemModal
+    id: [=..MessageTray=]
+    title: Intrasystem Messaging
+    icon: [=$MessageTrayIcon=]
+    security: users
+    contains:
+      ctxt white, Messaging App Here
+      
+  ZloUI.SystemModalPlain
+    id: [=..LoginTray=]
+    title: Login
+    icon: [=$LoginTrayIcon=]
+    contains:
+      new [=..LoginPane=]
+        xy ${canvas.width-this.width}, 0
+        
+  ZloUI.RightTab
+    id: [=..UserInfoTab=]
+    label: User Info
+    wh: 250, 100
+    contains:
+      vert
+        centered
+        horiz
+          txt USER:
+          replicate [=..ZloData.securityset=]:/security/user
+            txt $path{'@name'}
+        horiz
+          txt GROUPS:
+          replicate [=..ZloData.securityset=]:/security/group
+            txt $path{'@name'}
+        
+        
+  #)system message utility
+  new [=..messageModal=]
+    id [=..SystemModalMessage=]
+    xy ${canvas.width/2-this.width/2}, ${canvas.height/2-this.height/2}
+    wh [=$MessageModalWidth=]
+    font [=..communicate=]
+    fontsize 16
+    
+  new [=..messageDialog=]
+    id [=..SystemMessage=]
+    xy ${canvas.width/2-this.width/2}, ${canvas.height/2-this.height/2}
+    wh [=$MesageDialogWidth=]
+    
+  #viewid [=..introOverlay=]
+  #  whof canvas
+  #  bgcolor white
+
+#)Paints the List of Active windows in the startbar
+@StartBarStructure
+  x 5
+  
+  closeBubble
+    width 18
+    middle
+    on init
+      this.alloff = false;
+    event onmouseover
+      this.setColorTransform([=..ActiveSysTrayTint=]);
+    event onmouseout
+      this.setColorTransform([=..NoTint=]);
+    event onclick
+      var dp = canvas.datasets['[=..TaskBarDataset=]'].getPointer();
+      dp.selectChild();
+      do{
+        win = eval(dp.getNodeAttribute('id'));
+        win.minimize(true);
+      }while(dp.selectNext());
+      
+  clipview
+    viewname bar
+      middle
+      #set y 8
+      width ${canvas.width/1.5}
+      #make the end pieces go away if there is no need for them
+      on x
+        if(this.x == 0) parent.glassL.setOpacity(0.01);
+        else parent.glassL.setOpacity(1);
+        
+        if(this.x == -(windows.width-this.width)) parent.glassR.setOpacity(0.01);
+        else parent.glassR.setOpacity(1);
+        
+      #this dragstate global is used by the smallBarButton (which, being above)
+      #has to capture the event to move (as well as click)
+      new dragstate set id [=..activeWinDragger=]
+        set drag_axis x
+        set drag_min_x ${-(windows.width-this.width)}
+        set drag_max_x 0
+        
+      #draw the two parts of the start bar - desktop apps and window apps
+      viewname windows
+        halign
+        middle
+        new [=..StartBar=]
+          middle
+          set datapath [=..TaskBarDataset=]:/desktop
+          set minimized $path{'@minimized'}
+        viewwh 7, 1
+        new [=..StartBar=]
+          middle
+          set datapath [=..TaskBarDataset=]:/window
+          set minimized $path{'@minimized'}
+          set tint true
+          
+    viewimg [=..GlassBarL=]
+      name glassL
+      opacity 0
+    viewimg [=..GlassBarR=]
+      name glassR
+      xy ${parent.bar.width-this.width}, 0
+      
+
+#)Paints the Sys Tray items in the startbar
+@SysTrayStructure
+  new [=..SysTrayIcon=] 
+    set datapath [=..SysTrayDataset=]:/icon
+    wh [=$SysTrayIconSize=]
+    stretch
+    img $path{'@icon'}
+    set action $path{'@action'}
+  
+  viewid [=..vmtoggle=]
+    img [=..VMIcon=]
+    script
+      var [=..vmviewstate=] = false;
+    wh [=$SysTrayIconSize=]
+    stretch
+    event onclick
+      if([=..vmviewstate=]){ 
+        [=..vmtoggle=].setColorTransform([=..NoTint=]);
+        [=..vmdisplay=].animate('y', -227, 500, true); 
+        [=..vmdisplay=].animate('opacity', 0, 500, false); 
+      }
+      else{
+        [=..vmtoggle=].setColorTransform([=..ActiveSysTrayTint=]);
+        [=..vmdisplay=].animate('y', 227, 500, true); 
+        [=..vmdisplay=].animate('opacity', 1, 500, false); 
+      }
+      [=..vmviewstate=] = ![=..vmviewstate=];
+
+
+
+#)
+#)        MACROS
+#)
+
+#)WINDOWS
+@Window
+  fragment ZloData.DatasetGenerator
+    set __elem__ window
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set x [=xy[0]=]
+    set y [=xy[1]=]
+    set width [=wh[0]=]
+    set height [=wh[1]=]
+    set vmx [=monitor[0]=]
+    set vmy [=monitor[1]=]
+    set minimized [=minimized=]
+    
+  markForMove [=moveto=]
+    secureView [=security=]
+      new [=..window=]
+        set datapath [=dataset=]:/window[@id='[=id=]']
+        set id [=id=]
+        set contentid [=id=]_content
+        set title $path{'@title'}
+        set minimized $path{'@minimized'}
+        xywh $path{'@x'}, $path{'@y'}, $path{'@width'}, $path{'@height'}
+        viewid [=id=]_content
+          clip
+          xywh 10, 23, ${parent.width-19}, ${parent.height-33}
+          [=contains=]
+          
+=Window
+  wh: 240, 320
+  title: Untitled Window
+  xy: 0, 0
+  monitor: 0, 0
+  moveto: [~..ZloUI.WindowsArea~]
+  dataset: [~..ZloUI.TaskBarDataset~]
+  security: anonymous
+  minimized: false
+  contains:
+    txt Empty Window
+            
+@WindowWithMenu
+  fragment ZloData.DatasetGenerator
+    set __elem__ window
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set x [=xy[0]=]
+    set y [=xy[1]=]
+    set width [=wh[0]=]
+    set height [=wh[1]=]
+    set monitor [=monitor=]
+    set vmx [=monitor[0]=]
+    set vmy [=monitor[1]=]
+    
+  markForMove [=moveto=]
+    secureView [=security=]
+      new [=..window=]
+        set datapath [=dataset=]:/window[@id='[=id=]']
+        set id [=id=]
+        set contentid [=id=]_content
+        set title $path{'@title'}
+        set minimized $path{'@minimized'}
+        xywh $path{'@x'}, $path{'@y'}, $path{'@width'}, $path{'@height'}
+        viewid [=id=]_content
+          xywh 10, 23, ${parent.width-19}, ${parent.height-53}
+          valign
+          clipview
+            wh ${parent.width}, 20
+            [=?menu=]
+          clipview
+            fullsize
+            [=contains=]
+    
+=WindowWithMenu
+  wh: 240, 320
+  title: Untitled Window
+  xy: 0, 0
+  monitor: 1, 1
+  security: anonymous
+  moveto: [~..ZloUI.WindowsArea~]
+  dataset: [~..ZloUI.TaskBarDataset~]
+  contains:
+    txt Empty Window
+    
+#)MODALS
+@SystemModal
+  loadResource [=.icon=], [=icon=]
+  
+  fragment ZloData.DatasetGenerator
+    set __elem__ icon
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set icon [=.icon=]
+    set action false
+    
+  markForMove [=moveto=]
+    secureView [=security=]
+      new [=..modal=]
+        id [=id=]
+        opacity 0
+        clickable true
+        set contentid [=id=]_content
+        set title [=title=]
+        fullsize
+        clipview
+          id [=id=]_content
+          xywh 20, 60, ${parent.width-40}, ${parent.height-80}
+          [=contains=]
+
+=SystemModal
+  title: Untitled Modal
+  security: anonymous
+  moveto: [~..ZloUI.ModalsArea~]
+  dataset: [~..ZloUI.SysTrayDataset~]
+  contains:
+    view
+      centered
+      txt Empty Modal
+      
+      
+@SystemModalPlain
+  loadResource [=.icon=], [=icon=]
+
+  fragment ZloData.DatasetGenerator
+    set __elem__ icon
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set icon [=.icon=]
+    set action false
+    
+  markForMove [=moveto=]
+    secureView [=security=]
+      viewid [=id=]
+        opacity 0
+        clickable true
+        fullsize
+        viewid [=id=]_content
+          [=contains=]
+
+=SystemModalPlain
+  title: Untitled Plain Modal
+  security: anonymous
+  moveto: [~..ZloUI.ModalsPlainArea~]
+  dataset: [~..ZloUI.SysTrayDataset~]
+  contains:
+    view
+      wh 200, 200
+      roundbox
+        opacity 0.7
+      centered
+      txt Empty Modal
+      
+@SystemModalAction
+  loadResource [=.icon=], [=icon=]
+
+  fragment ZloData.DatasetGenerator
+    set __elem__ icon
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set icon [=.icon=]
+    set action [=id=]
+    
+  secureViewUnsized [=security=]
+    viewid [=id=]
+      method
+        name: action
+        contains:
+          [=contains=]
+    
+=SystemModalAction
+  id: [~.id~]
+  title: Untitled Action
+  dataset: [~..ZloUI.SysTrayDataset~]
+  security: anonymous
+  contains:
+    return false
+    
+#)Side Tab Stuff
+@RightTab
+  fragment ZloData.DatasetGenerator
+    set __elem__ tab
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set label [=label=]
+    
+  markForMove [=moveto=]
+    secureViewUnsized [=security=]
+      horiz
+        set x ${-this.tab.width}
+        opacity [=$SystemTabOffOpacity=]
+        height ${this.tab.height}
+        new [=..sideTab=]
+          id [=id=]
+          name tab
+          set datapath [=dataset=]:/tab[@id='[=id=]']
+          set label $path{'@label'}
+        view
+          id [=id=]_content
+          name content
+          wh [=wh=]
+          clip
+          clickable true
+          roundbox
+            fgcolor 0x979797
+          [=contains=]
+          
+=RightTab
+  id: [~.id~]
+  title: Untitled Tab
+  moveto: [~..ZloUI.SideTabsArea~]
+  dataset: [~..ZloUI.SysTabsDataset~]
+  security: anonymous
+  wh: 300, 200
+  contains:
+    txt Empty Window   
+    
+ 
+#)Desktop Support - placing apps on the desktop
+@Desktop
+  fragment ZloData.DatasetGenerator
+    set __elem__ desktop
+    set __dataset__ [=dataset=]
+    set id [=id=]
+    set title [=title=]
+    set security [=security=]
+    set minimized [=minimized=]
+    set icon [=icon=]
+    set vmx [=monitor[0]=]
+    set vmy [=monitor[1]=]
+    
+  markForMove [=moveto=]
+    secureView [=security=]
+      new [=..DesktopShell=]
+        set datapath [=dataset=]:/desktop[@id='[=id=]']
+        set minimized $path{'@minimized'}
+        id [=id=]
+        clip
+        wof parent
+        height ${parent.height-30}
+        [=contains=]
+
+=Desktop
+  title: Untitled App
+  security: anonymous
+  monitor: 1, 1
+  minimized: true
+  moveto: [~..ZloUI.DesktopArea~]
+  dataset: [~..ZloUI.TaskBarDataset~]
+  icon: NONE
+  contains:
+    txt Empty Window   
+      fgcolor 0x0000ff
+      
+#These are hardwired into slots because they just advertise a plain view, shifted in z-order by the move,
+#which is not useful for anything else.
+@SimpleDesktop
+  markForMove [=..SimpleDesktopArea=]
+    secureView [=security=]
+      viewid [=id=]
+        wh ${parent.height-30}, ${parent.width}
+        [=contains=]
+
+=SimpleDesktop
+  id: [~.id~]
+  security: anonymous
+  monitor: 1, 1
+  contains:
+    txt Empty Window   
+      fgcolor 0x0000ff
+      
+#)Fullscreen Stuff
+@FullScreen
+  markForMove [=..FullScreenArea=]
+    secureViewUnsized [=security=]
+      viewid [=id=]
+        whof canvas
+        opacity 0
+        bgcolor [=bgcolor=]
+        [=contains=]
+
+=FullScreen
+  id: [~.id~]
+  security: anonymous
+  bgcolor: black
+  contains:
+    txt Empty Window   
+      fgcolor 0x0000ff
+      
+#)ALPHA Menu Classes
+@MenuStrip
+  viewimg [=..menubck1=]
+    stretch both
+    fullsize
+  horiz
+    new [=..menu=]
+      pass    
+      
+@roundview
+  view
+    width [=w=]
+    height [=h=]
+    set x [=x=]
+    set y [=y=]
+    roundbox
+      [=?box=]
+    view
+      fullsize
+      margin [=?margin=]
+      [=?contains=]
+    
+=roundview
+  w: ${parent.width}
+  h: ${parent.height} 
+  x: 0
+  y: 0
+  
+@DesktopSwitcher
+  new [=..DesktopSwitcherText=]
+    pass
+    
+@DesktopSwitcherIcons
+  new [=..DesktopSwitcherIcons=]
+    pass
+
+=DesktopSwitcherIcons
+  iconsize: 50
+
+
+    
+    
+#)
+#)        CLASSES
+#)
+  
+@makeWindowClass
+  Object [=name=]
+    string title
+    string contentid
+    string minimized
+    string security
+    expr sheets
+
+    resize resizer
+    drag dragger
+    opacity 0
+    
+    #make sure we save x's and y's, even through animations from other components.
+    on x
+      this.datapath.setNodeAttribute('x', this.x);
+    on y
+      this.datapath.setNodeAttribute('y', this.y);
+    on width
+      this.datapath.setNodeAttribute('width', this.width);
+    on height
+      this.datapath.setNodeAttribute('height', this.height);
+      
+    on minimized
+      if(this.getAttribute('minimized') == 'true'){
+        this.shadow.animate('opacity', 0, 25, false);
+        this.animate('opacity', 0, [=$WindowOpacitySpeed=], false);
+      }else{
+        this.shadow.animate('opacity', [=$WindowShadowOpacity=], [=$WindowOpacitySpeed=], false);
+        this.animate('opacity', 1, [=$WindowOpacitySpeed=], false);
+      }
+    
+    def sheet, num
+      var i = 0;
+      Debug.write('this.sheets');
+      for(var id in this.sheets){
+        eval(id).animate('x', 20, 700, false);
+      }
+
+    def minimize, force
+      if(this.getAttribute('minimized') != 'true' || force == true){
+        this.datapath.setNodeAttribute('minimized', 'true');
+      }
+      else{
+        this.datapath.setNodeAttribute('minimized', 'false');
+      }
+        
+    def windown
+      return true;
+      this.window.animate('x', 3, 250, true);
+      this.window.animate('y', 3, 250, true);
+      this.shadow.animate('x', -5, 250, true);
+      this.shadow.animate('y', -5, 250, true);
+      this.shadow.animate('opacity', 0.2, 250, true);
+      content = eval(this.getAttribute('contentid'));
+      content.animate('x', 3, 250, true);
+      content.animate('y', 3, 250, true);
+        
+    def winup
+      return true;
+      this.window.animate('x', -3, 250, true);
+      this.window.animate('y', -3, 250, true);
+      this.shadow.animate('x', 5, 250, true);
+      this.shadow.animate('y', 5, 250, true);
+      this.shadow.animate('opacity', -0.2, 250, true);
+      content = eval(this.getAttribute('contentid'));
+      content.animate('x', -3, 250, true);
+      content.animate('y', -3, 250, true);
+        
+    shadow
+      name shadow
+      opacity [=$WindowShadowOpacity=]
+      fgcolor [=$WindowShadowColor=]
+      wh ${parseInt(classroot.width)+9}, ${parseInt(classroot.height)+9}
+    
+    viewname window
+      fullsize
+      new [=..osxwin=]
+        set rootid ${classroot.getAttribute('id')}
+        fontsize 16
+        fullsize
+          
+        onmousedown
+          classroot.parent.bringToFront();
+          classroot.dragger.apply();
+          classroot.winup();
+        
+        onmouseup
+          classroot.dragger.remove();
+          classroot.datapath.updateData();
+          classroot.windown();
+        
+        pillbox
+          name pillbox
+          xy ${parent.width-parent.pillbox.width-4}, 4
+          onclick
+            classroot.minimize();
+        
+        txt ${classroot.datapath.getNodeAttribute('title')}
+          #xy ${parent.width/2-parent.titlebar.width/2}, 0
+          xy 16, 1
+          font [=..ZloUI.communicate=]
+          fontsize [=$WindowTitleFontSize=]
+          name titlebar
+        
+      new [=..osxwininner=]
+        xywh 3, 16, ${parent.width-6}, ${parent.height-19}
+      
+      viewimg [=..winbacking=]
+        xywh 10, 23, ${parent.width-20}, ${parent.height-36}
+        stretch
+          
+      
+@makeModalClass
+  Object [=name=]
+    string title
+    string contentid
+    fullsize
+    roundbox
+      opacity [=$ModalOpacity=]
+    view
+      xy 25, 15
+      fontsize [=$ModalTitleFontSize=]
+      roundbox
+        fgcolor [=$ModalTitleBackgroundColor=]
+        opacity [=$ModalTitleBackgroundOpacity=]
+        wh ${parent.label.width+20}, ${parent.label.height+10}
+      viewname label
+        centered
+        txt ${classroot.title}
+          fgcolor [=$ModalTitleTextColor=]
+          name field
+
+@makeSimpleWindowClass
+  Object [=name=]
+    clip
+    opacity 0.01
+    wh 200, 400
+    on init
+      this.animate('opacity', 1, 400, false);
+    roundbox
+      fgcolor 0x000022
+      opacity 0.95
+    pillbox
+      xy ${classroot.width-this.width-3}, 3
+      onclick 
+        classroot.animate('opacity', 0, 400, false);
+        var closeDelegate = new LzDelegate(this, "close");
+        LzTimer.addTimer(closeDelegate, 410);
+      def close
+        classroot.destroy();
+    drag dragger
+    resize resizer
+    on mousedown
+      this.dragger.apply();
+    on mouseup
+      this.dragger.remove();
+    roundbox
+      wh 20, 20
+      xy ${classroot.width-this.width}, ${classroot.height-this.height},
+      fgcolor 0xb177f7
+      on mousedown
+        classroot.resizer.apply();
+      on mouseup
+        classroot.resizer.remove();
+    
+
+#)Start Bar Classes
+@makeSysTrayClass
+  Object [=name=]
+    string action, false
+    visible ${eval(this.datapath.getNodeAttribute('id')).parent.visible}
+    onclick
+      if(this.action != 'false'){
+        eval(this.action).action();
+        return true;
+      }
+      var obj = eval(this.datapath.getNodeAttribute('id'));
+      if(obj.opacity != 0){
+        this.modalShown = false;
+        this.setColorTransform([=..NoTint=]);
+        obj.setOpacity(0);
+      }
+      else{
+        if([=..lastModalShown=]){ 
+          [=..lastModalShown=].setOpacity(0); 
+          [=..lastModalIconShown=].setColorTransform([=..NoTint=]);
+        }
+        obj.setOpacity([=$ModalOpacity=]);
+        this.setColorTransform([=..ActiveSysTrayTint=]);
+        [=..lastModalShown=] = obj;
+        [=..lastModalIconShown=] = this;
+      }
+    
+#each instance is linked to one window on the screene is  via singleton dataset
+@makeStartBarClass     
+  Object [=name=]
+    string tint, false
+
+    visible ${eval(this.datapath.getNodeAttribute('id')).parent.visible}
+    fontsize 13
+    
+    on minimized
+      if(this.getAttribute('minimized') == 'true'){
+        this.setColorTransform([=..NoTint=]);
+      }else{
+        this.setColorTransform([=..TaskBarDownTint=]);
+      }
+    
+    #this logic activates the horiztonal drag as well as 
+    #making a button do it's thing
+    smallBarButton 
+      set label $path{'@title'}
+      onclick
+        if(this['lastx'] == canvas.getMouse('x')){
+          obj = eval(classroot.datapath.getNodeAttribute('id'));
+          obj.parent.bringToFront();
+          obj.minimize();
+          #save this information for use elsewhere if desktop
+          if(classroot.datapath.getNodeName() == 'desktop'){
+            var dp = canvas.datasets['[=..GlobalSettings=]'].getPointer();
+            dp.setXPath('activewindow');
+            dp.setNodeAttribute('title', this.getAttribute('label'));
+            dp.setNodeAttribute('id', classroot.datapath.getNodeAttribute('id'));
+          }
+
+        }
+      onmousedown
+        this.lastx = canvas.getMouse('x');
+        [=..activeWinDragger=].apply();
+      onmouseup
+        [=..activeWinDragger=].remove();
+      onmouseover
+        if(classroot.getAttribute('tint') != 'false'){
+          eval(classroot.datapath.getNodeAttribute('id')).setColorTransform([=..ActiveWinTint=]);
+        }
+      onmouseout
+        if(classroot.getAttribute('tint') != 'false'){
+          eval(classroot.datapath.getNodeAttribute('id')).setColorTransform([=..NoTint=]);
+        }
+
+@makeDesktopSwitcherTextClass     
+  #each instance is linked to one window on the screene is  via singleton dataset
+  Object [=name=]
+    visible ${eval(this.datapath.getNodeAttribute('id')).parent.visible}
+    
+    on minimized
+      if(this.getAttribute('minimized') == 'true'){
+        this.label.animate('opacity', 0.01, [=$DesktopSwitcherSpeed=], false);
+        this.label.animate('width', 20, [=$DesktopSwitcherSpeed=], false);
+      }
+      else{
+        this.label.animate('opacity', [=$DesktopSwitcherOpacity=], [=$DesktopSwitcherSpeed=], false);
+        this.label.animate('width', this.field.width+15, [=$DesktopSwitcherSpeed=], false);
+      }
+      
+    #make a label to overlay the screen
+    viewname label
+      wh 20, ${parent.field.height+5}
+      opacity 0.01
+      center
+      roundbox
+        fgcolor [=$DesktopSwitcherBackgroundColor=]
+        opacity [=$DesktopSwitcherBackgroundOpacity=]
+    
+    shadowtxt [=$DesktopSwitcherTextColor=], $path{'@title'}
+      name field
+      fontsize [=$DesktopSwitcherTextFontSize=]
+      font [=$DesktopSwitcherTextFont=]
+      centered
+      
+      #ugly hack! if the desktop is not initally minimized, this sets the width of the highlight
+      #correctly, otherwise, at first, the datapath isn't set - the text isn't set - the width is wrong.
+      #ah well.
+      initstage late
+      on init
+        if(classroot.getAttribute('minimized') != 'true'){
+          parent.label.animate('width', this.width+15, [=$DesktopSwitcherSpeed=], false);
+        }
+      
+      on mouseover
+        if(classroot.getAttribute('minimized') == 'true'){
+          parent.label.animate('opacity', [=$DesktopSwitcherOpacity=], [=$DesktopSwitcherSpeed=], false);
+          parent.label.animate('width', parent.field.width+15, [=$DesktopSwitcherSpeed=], false);
+        }
+      on mouseout
+        if(classroot.getAttribute('minimized') == 'true'){
+          parent.label.animate('opacity', 0.01, [=$DesktopSwitcherSpeed=], false);
+          parent.label.animate('width', 20, [=$DesktopSwitcherSpeed=], false);
+        }
+      on click
+        var obj = eval(classroot.datapath.getNodeAttribute('id'));
+        obj.minimize();
+        
+@makeDesktopSwitcherIconsClass
+  #each instance is linked to one window on the screene is  via singleton dataset
+  Object [=name=]
+    number iconsize
+    visible ${eval(this.datapath.getNodeAttribute('id')).parent.visible}
+    wof parent
+    on minimized
+      if(this.getAttribute('minimized') == 'true'){
+        this.setColorTransform([=..NoTint=]);
+      }else{
+        this.setColorTransform([=..TaskBarDownTint=]);
+      }
+      
+    #make the icon image
+    viewimg $path{'@icon'}
+      name icon
+      centered
+      stretch
+      wh ${classroot.iconsize}, ${classroot.iconsize}
+      
+    #make a label to overlay the screen
+    viewname label
+      wh ${field.getTextWidth()+15}, ${field.getTextHeight()+5}
+      opacity 0.01
+      centered
+      roundbox
+        fgcolor [=$DesktopSwitcherBackgroundColor=]
+        opacity [=$DesktopSwitcherBackgroundOpacity=]
+        #handle mouse events to show label & desktop
+        on click
+          var obj = eval(classroot.datapath.getNodeAttribute('id'));
+          obj.minimize();
+        on mouseover
+          parent.animate('opacity', [=$DesktopSwitcherOpacity=], 75, false);
+        on mouseout
+          parent.animate('opacity', 0.01, 300, false);
+      txt $path{'@title'}
+        name field
+        font [=..ZloUI.communicate=]
+        fontsize [=$DesktopSwitcherTextFontSize=]
+        fgcolor white
+        centered  
+          
+#)Virtual Monitors Classes
+@makeVirtualMonitorsClass               
+  Object [=name=]
+    clipview
+      wh ${classroot.width*2}, ${classroot.height*2}
+      oneVMPane
+        color: [=color=], [=highlight=]
+        xy: 0, 0
+        coordinate: 0, 0
+      oneVMPane
+        color: [=color=], [=highlight=]
+        xy: ${classroot.width}, 0
+        coordinate: 1, 0
+      oneVMPane
+        color: [=color=], [=highlight=]
+        xy: 0, ${classroot.height}
+        coordinate: 0, 1
+      oneVMPane
+        color: [=color=], [=highlight=]
+        xy: ${classroot.width}, ${classroot.height}
+        coordinate: 1, 1
+      view
+        whof classroot
+        new [=..vmwindow=]
+          set datapath [=..TaskBarDataset=]:/window
+          set obj $path{'@id'}
+          
+@oneVMPane
+  view
+    xy [=xy=]
+    whof classroot
+    roundbox 
+      fgcolor [=color[0]=]
+      opacity 0.9
+    oRoundedRollover [=color[1]=], 0.5, 400
+      onclick
+        changeVirtual([=coordinate[0]=], [=coordinate[1]=]);
+      ondblclick
+        [=..vmtoggle=].setColorTransform([=..NoTint=]);
+        [=..vmdisplay=].animate('y', -227, 500, true); 
+        [=..vmdisplay=].animate('opacity', 0, 500, false); 
+        [=..vmviewstate=] = ![=..vmviewstate=];
+            
+@makeVMWindowClass
+  #each instance is linked to one window on the screen via singleton dataset
+  Object [=name=]
+    expr obj
+    
+    #hide this if it's secureView is also hidden (parent)
+    visible ${eval(this.getAttribute('obj')).parent.visible}
+    bgcolor [=color=]
+    xy ${parent.width/canvas.width*eval(this.getAttribute('obj')).x}, ${parent.height/canvas.height*eval(this.getAttribute('obj')).y}
+    wh ${eval(this.getAttribute('obj')).width/canvas.width*parent.width}, ${eval(this.getAttribute('obj')).height/canvas.height*parent.height}
+    opacity ${eval(this.getAttribute('obj')).opacity/2}
+    drag dragger
+      set drag_min_x 0
+      set drag_min_y 0
+      set drag_max_x ${(parent.width*2)-this.width}
+      set drag_max_y ${(parent.height*2)-this.height}
+    on x
+      eval(this.getAttribute('obj')).setX((canvas.width/parent.width)*this.x);
+    on y
+      eval(this.getAttribute('obj')).setY((canvas.height/parent.height)*this.y);
+    viewname label
+      roundbox
+        fgcolor [=textbackground=]
+        wh ${parent.field.width+10}, ${parent.field.height+8} 
+        opacity 0.4
+      centered
+      opacity 0
+      txt ${eval(classroot.getAttribute('obj')).title}
+        centered
+        name field
+        fontsize 10
+        fgcolor [=textcolor=]
+    onmousedown
+      if(eval(this.getAttribute('obj')).opacity != 0){
+        this.bringToFront();
+        eval(this.getAttribute('obj')).parent.bringToFront();
+        dragger.apply();
+        eval(this.getAttribute('obj')).winup();
+      }
+    onmouseover
+      if(eval(this.getAttribute('obj')).opacity != 0){
+        this.animate('opacity', 0.9, 200, false);
+        this.setBGColor('[=highlight=]');
+        this.label.animate('opacity', 1, 250, false);
+        eval(this.getAttribute('obj')).setColorTransform([=..ActiveWinTint=]);
+      }
+    onmouseout
+      if(eval(this.getAttribute('obj')).opacity != 0){
+        this.label.animate('opacity', 0, 250, false);
+        this.animate('opacity', eval(this.getAttribute('obj')).opacity/2, 200, false);
+        this.setBGColor('[=color=]');
+        eval(this.getAttribute('obj')).setColorTransform([=..NoTint=]);
+      }
+    onmouseup
+      if(eval(this.getAttribute('obj')).opacity != 0){
+        dragger.remove();
+        eval(this.getAttribute('obj')).windown(); 
+      }
+
+
+#)Login Functionality
+@makeLoginPane
+  Object [=name=]
+    waypoint
+    loadResource [=..loginpane=], icons/login.png
+    
+    def submitLoginInfo
+      var obj = new Object;
+      obj.login = classroot._.user.getText();
+      obj.password = classroot._.password.getText();
+      ZloData_securityset_send(obj, this, "response");
+      
+    def response
+      var dp = canvas.datasets['ZloData_securityset'].getPointer();
+      var username = dp.xpathQuery('/security/user/@name');
+      if(username != 'anonymous'){
+        [=..SystemMessage=].display('Logged in as: ' + username);
+        classroot._.user.clearText();
+        classroot._.password.clearText();
+      }else{
+        [=..SystemMessage=].display('You are not logged in.');
+        return false;
+      }
+    
+    shadow
+      set opacity 0.6
+      whof classroot.pane
+      xy 0, 6
+  
+    viewname pane
+      img [=..loginpane=]
+      view
+        initstage late
+        datapath ZloData_securityset:/security/user[@name='anonymous']
+        visible $path{'@name'}
+        edittext
+          waypoint user
+          doesenter true
+          xy 120, 3
+          wh 160, 25
+          def doEnterDown
+            classroot.submitLoginInfo();
+    
+        edittext
+          waypoint password
+          doesenter true
+          set password true
+          xy 285, 3
+          wh 160, 25  
+          def doEnterDown
+            classroot.submitLoginInfo();
+            
+      viewname logout
+        set visible ${!classroot._.login.visible}
+        set x ${parent.width-this.width}
+        middle
+        horiz
+          set datapath ZloData_securityset:/security/user
+          ctxt white, Logged in as:
+          ctxt red, $path{'@name'}
+          smallGlassButton Logout
+            onclick
+              var obj = new Object;
+              obj.login = '_LOGOUT';
+              ZloData_securityset_send(obj, classroot, "response");          
+              
+@makeMenuClass
+  Object [=name=]
+    string label
+    txt ${classroot.label}
+      font [=..ZloUI.communicate=]
+      center
+      
+      
+@makeDesktopShellClass
+  Object [=name=]
+    on minimized
+      if(this.getAttribute('minimized') == 'true'){
+        this.setVisible(0);
+      }else{
+        this.setVisible(1);
+      }
+      
+    def minimize, force, toggleflag
+      if(this.getAttribute('minimized') == 'false' || force == true){
+        this.datapath.setNodeAttribute('minimized', 'true');
+      }
+      else{
+        this.datapath.setNodeAttribute('minimized', 'false');
+        var tid = this.datapath.getNodeAttribute('id');
+        var dp = this.datapath.dupePointer();
+        dp.selectParent();
+        dp.selectChild();
+        do{
+          var currid = dp.getNodeAttribute('id');
+          if(currid != tid && dp.getNodeName() == 'desktop'){
+            eval(currid).minimize(true);
+          }
+        }while(dp.selectNext()); 
+      }
+          
+@makeSideTabClass
+  Object [=name=]
+    string label, UnnamedTab
+    
+    loadResource [=.top=], [=top=]
+    loadResource [=.middle=], [=middle=]
+    loadResource [=.bottom=], [=bottom=]
+    
+    on init
+      this.opened = false;
+    
+    vert
+      name tab
+      viewimg [=.top=]
+      viewname middle
+        img [=.middle=]
+        height ${classroot.title.field.getTextWidth()}
+        stretch height
+      viewimg [=.bottom=]
+      
+    viewname title
+      centered
+      txt ${classroot.label}
+        y ${this.getWidth()}
+        name field
+        font [=..ZloUI.communicate=]
+        fontsize [=$SystemTabFontSize=]
+        rotation -90
+      
+    on mouseover
+      this.parent.animate('opacity', [=$SystemTabOnOpacity=], [=$SystemTabOpacitySpeed=], false);
+    on mouseout
+      if(!this.opened){
+        this.parent.animate('opacity', [=$SystemTabOffOpacity=], [=$SystemTabOpacitySpeed=], false);
+      }
+      
+    #?make all the other tabs close if open, too. (TOGGLE DATASET TO STATE!)
+    on click
+      this.minimize();
+      
+    def minimize
+      if(!this.opened){
+        var tid = this.getAttribute('id');
+        var dp = this.datapath.dupePointer();
+        dp.selectParent();
+        dp.selectChild();
+        do{
+          var currid = dp.getNodeAttribute('id');
+          if(currid != tid){
+            var obj = eval(currid).parent;
+            obj.animate('x', -this.tab.middle.resourcewidth, [=$SystemTabOutSpeed=], false);
+            obj.animate('opacity', [=$SystemTabOffOpacity=], [=$SystemTabOpacitySpeed=], false);
+            obj.tab.opened = false;
+          }
+        }while(dp.selectNext());
+        this.parent.parent.bringToFront();
+        this.parent.animate('x', -this.parent.content.width, [=$SystemTabOutSpeed=], true);
+        this.parent.animate('opacity', [=$SystemTabOnOpacity=], [=$SystemTabOpacitySpeed=], false);
+      }else{
+        this.parent.animate('x', -this.tab.middle.resourcewidth, [=$SystemTabOutSpeed=], false);
+      }
+      this.opened = !this.opened;
+
+  

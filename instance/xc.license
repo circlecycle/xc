@@ -1,0 +1,70 @@
+ BLOOMS FOUNDATION FREE SOFTWARE LICENSE
+
+Copyright (C) 2005-2007 XC Organization.  All rights reserved.
+
+This is the free software license for XC version 0.7.0; it covers private
+use, use of third-party application programs based on XC, and development
+of free software for the free software community.
+
+
+			COPYRIGHT AND RESTRICTIONS
+
+The XC toolkit is a product of the XC Foundation.
+
+You may copy this version of the XC toolkit provided that the entire
+archive is distributed unchanged and as a whole, including this notice.
+
+You may use this version of the XC toolkit to compile, link and use
+application programs and reusable components legally developed by
+third parties.
+
+You may use the XC toolkit to create application programs provided that:
+  - You accept this license.
+  - Your software does not require modifications to XC.
+  - You satisfy ONE of the following three requirements
+    EITHER
+      Users of your software can obtain source code for the software, freely
+      modify the source code (possibly with restrictions on copyright
+      notices, attributions and legal responsibility), and freely
+      redistribute original or modified versions of the software.
+    OR
+      Your software is distributed under the GNU GENERAL PUBLIC LICENSE,
+      version 2 or later, as defined by the Free Software Foundation.
+    OR
+      Your software is distributed under the GNU LIBRARY GENERAL PUBLIC
+      LICENSE, version 2 or later, as defined by the Free Software Foundation.
+
+If you are paid to develop something with XC Organization or it is a part of your job
+the following conditions also apply:
+  - Your software must not require libraries, programs, data or
+    documentation that are not available outside your organization in
+    order to compile or use.
+  - If and when your organization starts using the software, you must
+    notify the XC Organization of the following:
+       * Your organization's name and purpose.
+       * The software's name and purpose.
+       * The software's license.
+       * That your organization considers the software to be free software.
+
+You may also use the XC toolkit to create reusable components (such as
+libraries) provided that you accept the terms above, and in addition that:
+  - Your components' documentation includes the following text:
+	[Your package] requires the XC library, which is copyright
+	the XC Organization.	Freely distributable programs may generally
+	use XC for free, see [README.BLOOMS] for details.
+  - README.BLOOMS is distributed along with your components.
+  - XC is not distributed as an integral part of your components.
+
+
+		       LIMITATIONS OF LIABILITY
+
+The XC Organization makes no obligation under this license to support or upgrade
+XC, or assist in the use of XC.
+
+In no event shall the XC Organization be liable for any lost revenue or profits
+or other direct, indirect, special, incidental or consequential damages,
+even if the XC Organization has been advised of the possibility of such damages.
+
+BLOOMS IS PROVIDED AS IS WITH NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY
+OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

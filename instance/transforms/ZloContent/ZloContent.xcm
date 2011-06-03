@@ -1,0 +1,30 @@
+
+# Filename: ZloContent.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+@remoteText
+  remotelink
+    name: [=name=]
+    src: [~BASEURLREL~]ZloContent/getFile/[=path=]
+    
+  DataLoadingView 
+    dataset: [=name=]
+    linkto: [=linkto=]
+    clip
+    wofminus parent, 13
+    txt $path{'text()'}
+      datapath [=name=]:/content
+      wof parent
+      multiline
+      selectable
+      font [=?font=]
+      fontsize [=fontsize=]
+      [=?attrs=]
+  scroll
+  
+=remoteText
+  linkto: true
+  fontsize: 14
+            
+        

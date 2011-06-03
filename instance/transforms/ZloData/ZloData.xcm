@@ -1,0 +1,175 @@
+
+# Filename: ZloData.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include ZloBase, XCStubs
+
+start
+  pass
+  #makeFileUploaderClass
+  #  name: [=..FileUpload=]
+  #makeProgressBarClass
+  #  name: [=..ProgressBar=]
+  #makeUploadDialogClass
+  #  name: [=..UploadDialog=]
+      
+#)datasets
+@remoteset
+  fragment ZloData.remoteset
+    set name [=name=]
+    set src [=src=]
+    set security [=?security=]
+    set type [=?type=]
+    
+@remotelink
+  fragment ZloData.remoteset %% link=True
+    set name [=name=]
+    set src [=src=]
+    set security [=?security=]
+    set type [=?type=]
+    
+@classremoteset
+  fragment ZloData.classremoteset
+    set name [=name=]
+    set src [=src=]
+    set security [=?security=]
+    set type [=?type=]
+    set ondata 
+      [=??ondata=]
+    
+  on init
+    var obj = new Object;
+    [=?initargs=]
+    this.[=name=].setQueryString(obj);
+    this.[=name=].doRequest();
+    [=..loadingflag=].setOpacity(1);
+    [=..loadingflag=].animate('opacity', 0.00, 700, false);
+    
+#)SECURITY WRAPPER - this is invisble if the security entry doesn't exist in the dataset.. it's also why several calls use 'parent', since 
+#)this view is really the master view. Datapath semantics require the security be outside, not inside, as well as to hide the whole content.
+@secureView
+  new view
+    set datapath [=..securityset=]:/security/group[@name=[=`0`=]]
+    set visible $path{'@name=[=0=]'}
+    fullsize
+    
+@secureViewUnsized
+  new view
+    set datapath [=..securityset=]:/security/group[@name=[=`0`=]]
+    set visible $path{'@name=[=0=]'}
+    
+@DataLoadingView
+  view 
+    visible [=linkto=]
+    on init
+      if(this.visible){
+        [=dataset=]_send(null, null);
+        this.loadedFirstTime = true;
+      }else{
+        this.loadedFirstTime = false;
+      }
+    on visible
+      if(!this.loadedFirstTime && this.visible){
+        this.loadedFirstTime = true;
+        [=dataset=]_send(null, null);
+      }
+    pass
+=DataLoadingView
+  linkto: false
+      
+@dataset
+  init block
+    new dataset set name [=0=]
+      pass
+      
+@DatasetGenerator
+  fragment ZloData.DatasetGenerator
+    pass
+      
+@subset
+  new [=name=]
+    new entry loop [=.entry=] in [=`data[:]`=]
+      text [~[=.entry=]~]
+=subset
+  name: NoName
+  data: TestData
+  
+@replicate new view set datapath
+  
+@entry new entry set data  
+      
+@upload
+  new [=..UploadDialog=]
+    set url [=url=]
+    def response
+      [=response=]
+    pass
+        
+=upload
+  reponse: return false;
+      
+@newUploadDialogClass
+  objcet [=name=]
+    string url
+    string response, false
+    valign
+    new [=..ProgressBar=]
+      visible false
+      name progressBar
+      width 400
+
+    new [=..FileUpload=]
+      name fileuploader
+      def onComplete, fr
+        classroot.progressBar.setVisible(false);
+        classroot.fields.upload.setAttribute('enabled', false);
+        classroot.response();
+    
+      def onProgress, fr, bytesLoaded, bytesTotal
+        classroot.progressBar.setValue(bytesLoaded*100/bytesTotal);
+    
+      def onSelect, fr
+        classroot.fields.txtFile.setText(this.getName());
+        classroot.fields.upload.setAttribute('enabled', true);
+
+    horiz
+      name fields
+      new edittext set text Filename...
+        width 200
+        name txtFile
+        enabled false
+      
+      new button set text browse...
+        name browse
+        onclick classroot.fileuploader.browse();
+
+      new button set text upload
+        name upload
+        enabled false
+        onclick 
+          classroot.progressBar.setVisible(true);
+          classroot.fileuploader.upload(classroot.url);
+
+      
+@newFileUploaderClass
+  Object [=name=]
+    method
+      event: oninit
+      args: invoker
+      contains:
+        fr = new flash.net.FileReference();
+        fr.addListener(invoker);
+    
+    def browse
+      fr.browse();
+        
+    def getName
+      return fr.name;
+        
+    def upload, url
+      fr.upload(url);
+          
+
+
+      

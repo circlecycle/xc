@@ -1,0 +1,784 @@
+
+# Filename: ZloWidgets.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include ZloBase, ZloEffects
+
+start
+  initTint [=..sizerTint=], 50, 0, 0
+  initTint [=..noTint=], 0, 0, 0
+  
+  loadResource [=..closebubble=],   icons/closebubble.png
+
+  makeImageStretchBorderClass
+    name: [=..shadow=]
+    border: 10
+    innercolor: black
+    tl: shadow/tl.png
+    tr: shadow/tr.png
+    bl: shadow/bl.png
+    br: shadow/br.png
+    t:  shadow/t.png
+    r:  shadow/r.png
+    b:  shadow/b.png
+    l:  shadow/l.png
+    
+  makeDropdownClass
+    name: [=..aquaDropdown=]
+    wh: 247, 25
+    sheetsize: ${parent.width-25}, 150
+    sheetcolor: 0xf0f0ff
+    
+  makeImageBorderClass
+    name: [=..fuzzbox=]
+    border: 35
+    innercolor: white
+    tl: fuzzbox/fat_tl.png
+    tr: fuzzbox/fat_tr.png
+    bl: fuzzbox/fat_bl.png
+    br: fuzzbox/fat_br.png
+    t:  fuzzbox/fat_t.png
+    r:  fuzzbox/fat_r.png
+    b:  fuzzbox/fat_b.png
+    l:  fuzzbox/fat_l.png
+    
+  makeStretchBorderClass
+    name: [=..roundbox=]
+    border: 10
+    tl: roundlabel/tl.png
+    tr: roundlabel/tr.png
+    bl: roundlabel/bl.png
+    br: roundlabel/br.png
+    c:  roundlabel/c.png
+    
+  makeStretchButtonClass 
+    name:   [=..bigGlassButton=]
+    offset: 14
+    textcolor: white
+    l:  glass/button/big/l.png
+    c:  glass/button/big/c.png
+    r:  glass/button/big/r.png
+    hl: glass/button/big/hl.png
+    hc: glass/button/big/hc.png
+    hr: glass/button/big/hr.png
+    
+  makeStretchButtonClass 
+    name:   [=..smallGlassButton=]
+    offset: 11
+    textcolor: white
+    l:  glass/button/small/l.png
+    c:  glass/button/small/c.png
+    r:  glass/button/small/r.png
+    hl: glass/button/small/hl.png
+    hc: glass/button/small/hc.png
+    hr: glass/button/small/hr.png
+    
+  makeStretchButtonClass
+    name: [=..smallBarButton=]
+    offset: 5
+    textcolor: black
+    l:  aqua/smallBevel/l.png
+    c:  aqua/smallBevel/c.png
+    r:  aqua/smallBevel/r.png
+    hl: aqua/smallBevel/hl.png
+    hc: aqua/smallBevel/hc.png
+    hr: aqua/smallBevel/hr.png
+    
+  makeStaticImageClass
+    name: [=..pillbox=]
+    up:   glass/button/pill/p.png
+    over: glass/button/pill/hp.png
+    
+  makeDisclosureTriangleClass
+    name: [=..disclosureTriangle=]
+    upicon: icons/1rightarrow.png
+    downicon: icons/1downarrow.png
+    
+  makeAccordianClass
+    name: [=..infoAccordian=]
+  
+  makeRoundedText
+    name: [=..roundedText=]
+    
+    
+#)Component interfaces
+
+@infoAccordian 
+  new [=..infoAccordian=]
+    pass
+    
+=infoAccordian
+  labelfont: [=..ZloUI.axelrod=]
+  labelsize: 24
+  bodyfont: [=..ZloUI.communicate=]
+  bodysize: 12
+  highlightcolor: 0x2c81a8
+  bodycolor: 0xddddFF
+  
+@roundedText
+  new [=..roundedText=]
+    pass
+    
+@pillbox
+  new [=..pillbox=]
+    pass
+  
+@smallBarButton
+  new [=..smallBarButton=]
+    set label [=?ARGV=]
+    pass
+
+@shadow
+  new [=..shadow=]
+    fullsize
+    pass
+    
+@fuzzbox
+  new [=..fuzzbox=]
+    fullsize
+    pass
+  
+@roundbox
+  new [=..roundbox=]
+    fullsize
+    pass
+    
+@bigGlassButton
+  new [=..bigGlassButton=] set label [=ARGV=]
+    pass
+    
+=bigGlassButton
+  label: Test Button
+  
+@smallGlassButton
+  new [=..smallGlassButton=] set label [=ARGV=]
+    pass
+    
+=smallGlassButton
+  label: Test Button
+  
+@aquaDropdown
+  new [=..aquaDropdown=]
+    set id [=?id=]
+    set path [=path=]
+    set elem [=elem=]
+    set initial [=initialSelection=]
+    def doAfter
+      [=doAfter=]
+    pass
+    
+=aquaDropdown
+  elem: @data
+  doAfter: return false;
+  initialSelection: --select--
+
+@button
+  new button set text [=ARGV=]
+    pass
+    
+@closeBubble
+  viewimg [=..closebubble=]
+    pass
+
+@makeStaticImageClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      loadResource [=.up=], [=up=]
+      loadResource [=.over=], [=over=]
+      viewimg [=.up=]
+      viewimg [=.over=]
+        opacity 0
+        name over
+      event onmouseout
+        over.animate('opacity', 0, 600, false);
+      event onmouseover
+        over.animate('opacity', 0.7, 200, false);
+        
+@makeStaticButtonClass
+  Class
+    name: [=name=]
+    extends: view
+    params:
+      string: label
+    contains:
+      loadResource [=.up=], [=up=]
+      loadResource [=.over=], [=over=]
+      wh [=wh=]
+      viewimg [=.up=]
+        stretch width
+        fullsize
+      viewimg [=.over=]
+        opacity 0
+        name over
+        stretch width
+        fullsize
+      txt ${classroot.label}
+        name field 
+      event onmouseout
+        over.animate('opacity', 0, 600, false);
+      event onmouseover
+        over.animate('opacity', 0.7, 200, false);
+      
+  
+@makeImageBorderClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      loadResource [=.fatTL=], [=tl=]
+      loadResource [=.fatTR=], [=tr=]
+      loadResource [=.fatBL=], [=bl=]
+      loadResource [=.fatBR=], [=br=]
+      loadResource [=.fatT=],  [=t=]
+      loadResource [=.fatL=],  [=l=]
+      loadResource [=.fatB=],  [=b=]
+      loadResource [=.fatR=],  [=r=]
+      view 
+        #Sides
+        clip
+        viewimg [=.fatL=]
+          clip
+          height ${classroot.height-([=border=]*2)}
+          xy 0,[=border=]
+        viewimg [=.fatR=]
+          clip
+          height ${classroot.height-([=border=]*2)}
+          xy ${classroot.width-[=border=]}, [=border=]
+        viewimg [=.fatT=]
+          clip
+          width ${classroot.width-([=border=]*2)}
+          xy [=border=],0
+        viewimg [=.fatB=]
+          clip
+          width ${classroot.width-([=border=]*2)}
+          xy [=border=], ${classroot.height-[=border=]}
+          
+        #Corners
+        viewimg [=.fatTL=]
+          clip
+          xy 0,0
+        viewimg [=.fatTR=]
+          clip
+          xy ${classroot.width-[=border=]}, 0
+        viewimg [=.fatBL=]
+          clip
+          xy 0,${classroot.height-[=border=]}
+        viewimg [=.fatBR=]
+          clip
+          xy ${classroot.width-[=border=]}, ${classroot.height-[=border=]}
+        view
+          clip
+          bgcolor [=innercolor=]
+          xywh [=border=], [=border=], ${classroot.width-([=border=]*2)}, ${classroot.height-([=border=]*2)}
+     
+     
+@makeImageStretchBorderClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      loadResource [=.fatTL=], [=tl=]
+      loadResource [=.fatTR=], [=tr=]
+      loadResource [=.fatBL=], [=bl=]
+      loadResource [=.fatBR=], [=br=]
+      loadResource [=.fatT=],  [=t=]
+      loadResource [=.fatL=],  [=l=]
+      loadResource [=.fatB=],  [=b=]
+      loadResource [=.fatR=],  [=r=]
+      view 
+        #Sides
+        clip
+        viewimg [=.fatL=]
+          stretch height
+          height ${classroot.height-([=border=]*2)}
+          xy 0,[=border=]
+        viewimg [=.fatR=]
+          stretch height
+          height ${classroot.height-([=border=]*2)}
+          xy ${classroot.width-[=border=]}, [=border=]
+        viewimg [=.fatT=]
+          stretch width
+          width ${classroot.width-([=border=]*2)}
+          xy [=border=],0
+        viewimg [=.fatB=]
+          stretch width
+          width ${classroot.width-([=border=]*2)}
+          xy [=border=], ${classroot.height-[=border=]}
+          
+        #Corners
+        viewimg [=.fatTL=]
+          stretch
+          xywh 0,0, [=border=], [=border=]
+        viewimg [=.fatTR=]
+          stretch
+          xywh ${classroot.width-[=border=]}, 0, [=border=], [=border=]
+        viewimg [=.fatBL=]
+          stretch
+          xywh 0,${classroot.height-[=border=]}, [=border=], [=border=]
+        viewimg [=.fatBR=]
+          stretch
+          xywh ${classroot.width-[=border=]}, ${classroot.height-[=border=]}, [=border=], [=border=]
+        view
+          clip
+          bgcolor [=innercolor=]
+          xywh [=border=], [=border=], ${classroot.width-([=border=]*2)}, ${classroot.height-([=border=]*2)}
+     
+@makeImageStretchBorderResizeableClass
+  Class
+    name: [=name=]
+    extends: view
+    params:
+      string: rootid
+    contains:
+      loadResource [=.fatTL=], [=tl=]
+      loadResource [=.fatTR=], [=tr=]
+      loadResource [=.fatBL=], [=bl=]
+      loadResource [=.fatBR=], [=br=]
+      loadResource [=.fatT=],  [=t=]
+      loadResource [=.fatL=],  [=l=]
+      loadResource [=.fatB=],  [=b=]
+      loadResource [=.fatR=],  [=r=]
+      #Sides
+      viewimg [=.fatL=]
+        stretch height
+        height ${classroot.height-([=border=]*2)}
+        xy 0,[=border=]
+      viewimg [=.fatR=]
+        stretch height
+        height ${classroot.height-([=border=]*2)}
+        xy ${classroot.width-[=border=]}, [=border=]
+      viewimg [=.fatT=]
+        stretch width
+        width ${classroot.width-([=border=]*2)}
+        xy [=border=],0
+      viewimg [=.fatB=]
+        stretch width
+        width ${classroot.width-([=border=]*2)}
+        xy [=border=], ${classroot.height-[=border=]}
+        
+      #Corners
+      viewimg [=.fatTL=]
+        stretch
+        xywh 0,0, [=border=], [=border=]
+      viewimg [=.fatTR=]
+        stretch
+        xywh ${classroot.width-[=border=]}, 0, [=border=], [=border=]
+      viewimg [=.fatBL=]
+        stretch
+        xywh 0,${classroot.height-[=border=]}, [=border=], [=border=]
+      viewimg [=.fatBR=]
+        xywh ${classroot.width-[=border=]}, ${classroot.height-[=border=]}, [=border=]*2, [=border=]*2
+        roundbox
+          name highlight
+          fullsize
+          fgcolor 0xb2b6e7
+          opacity 0
+        onmouseover
+          highlight.animate('opacity', 0.7, 200, false);
+        onmouseout
+          highlight.animate('opacity', 0, 600, false);
+        onmousedown 
+          var obj = eval(classroot.getAttribute('rootid'));
+          obj.bringToFront();
+          obj.resizer.apply();
+        onmouseup  
+          var obj = eval(classroot.getAttribute('rootid')); 
+          obj.resizer.remove();
+          obj.datapath.updateData();
+      view
+        clip
+        bgcolor [=innercolor=]
+        xywh [=border=], [=border=], ${classroot.width-([=border=]*2)}, ${classroot.height-([=border=]*2)}
+        
+          
+@makeStretchBorderClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      loadResource [=.tl=], [=tl=]
+      loadResource [=.tr=], [=tr=]
+      loadResource [=.bl=], [=bl=]
+      loadResource [=.br=], [=br=]
+      loadResource [=.c=],  [=c=]
+      #)corners
+      viewimg [=.tl=]
+        xy 0,0
+      viewimg [=.tr=]
+        xy ${classroot.width-[=border=]}, 0
+      viewimg [=.bl=]
+        xy 0,${classroot.height-[=border=]}
+      viewimg [=.br=]
+        xy ${classroot.width-[=border=]}, ${classroot.height-[=border=]}  
+      #)sides
+      clipview
+        viewimg [=.c=]
+          wh ${classroot.width-([=border=]*2)}, [=border=]
+          xy [=border=], 0
+          stretch both
+      clipview
+        viewimg [=.c=]
+          wh [=border=], ${classroot.height-([=border=]*2)}
+          xy ${classroot.width-[=border=]}, [=border=]
+          stretch both
+      clipview
+        viewimg [=.c=]
+          wh ${classroot.width-([=border=]*2)}, [=border=]
+          xy [=border=], ${classroot.height-[=border=]}
+          stretch both
+      clipview
+        viewimg [=.c=]
+          wh [=border=], ${classroot.height-([=border=]*2)}
+          xy 0, [=border=]
+          stretch both
+      #)middle   
+      clipview
+        viewimg [=.c=]
+          stretch both
+          xywh [=border=], [=border=], ${classroot.width-([=border=]*2)}, ${classroot.height-([=border=]*2)}
+
+#) make a nice aqua type button
+@makeButtonClass
+  Class
+    name: [=name=]
+    extends: view
+    params:
+      string: label
+    contains:
+      loadResource [=.l=],  [=l=]
+      loadResource [=.c=],  [=c=]
+      loadResource [=.r=],  [=r=]
+      loadResource [=.hl=], [=hl=]
+      loadResource [=.hc=], [=hc=]
+      loadResource [=.hr=], [=hr=]
+      wh [=wh=]
+      viewname up
+        viewimg [=.c=]
+          name center
+          stretch width
+          xy [=int(offset)=], 0
+          width ${classroot.width-([=offset=]*2)}
+        viewimg [=.l=]
+          xy 0, 0
+        viewimg [=.r=]
+          xy ${classroot.width-[=offset=]}, 0
+            
+      viewname over
+        opacity 0
+        viewimg [=.hc=]
+          stretch width
+          xy [=int(offset)=], 0
+          width ${classroot.width-([=offset=]*2)}
+        viewimg [=.hl=]
+          xy 0, 0
+        viewimg [=.hr=]
+          xy ${classroot.width-[=offset=]}, 0
+          
+      view
+        name textfield
+        centered
+        txt ${classroot.label}
+          name field
+          fgcolor [=textcolor=]  
+          
+      event onmouseout
+        over.animate('opacity', 0, 600, false);
+      event onmouseover
+        over.animate('opacity', 0.7, 200, false);
+        
+@makeStretchButtonClass
+  Object [=name=]
+    string label, No Label
+    loadResource [=.l=],  [=l=]
+    loadResource [=.c=],  [=c=]
+    loadResource [=.r=],  [=r=]
+    loadResource [=.hl=], [=hl=]
+    loadResource [=.hc=], [=hc=]
+    loadResource [=.hr=], [=hr=]
+    width ${this.field.getTextWidth()+20}
+    viewname up
+      middle
+      viewimg [=.c=]
+        name center
+        stretch width
+        xy [=int(offset)=], 0
+        width ${classroot.width-([=offset=]*2)}
+      viewimg [=.l=]
+      viewimg [=.r=]
+        xy ${classroot.width-[=offset=]}, 0
+          
+    viewname over
+      middle
+      opacity 0
+      viewimg [=.hc=]
+        stretch width
+        xy [=int(offset)=], 0
+        width ${classroot.width-([=offset=]*2)}
+      viewimg [=.hl=]
+      viewimg [=.hr=]
+        xy ${classroot.width-[=offset=]}, 0
+        
+    txt ${classroot.label}
+      centered
+      name field
+      fgcolor [=textcolor=]  
+        
+    event onmouseout
+      over.animate('opacity', 0, 600, false);
+    event onmouseover
+      over.animate('opacity', 0.7, 200, false);
+  
+#) make a nice aqua type dropdown
+@makeDropdownClass
+  Class
+    name: [=name=]
+    params:
+      string: value, path, initial, elem
+    contains:
+      loadResource [=..dropdownUp=],        aqua/dropdown.png
+      loadResource [=..dropdownOver=],      aqua/dropdownOver.png
+      wh [=wh=]
+      viewname dropdown
+        viewimg [=..dropdownUp=]
+        viewimg [=..dropdownOver=]
+          name over
+          opacity 0.2
+      view
+        name selected
+        whof parent
+        txt ${classroot.initial}
+          width ${parent.width}
+          name textfield
+          xy 8, 2
+        on click
+          classroot.dropsheet.animate('height', [=sheetsize[1]=], 150, false, {motion: 'easeout'});
+          classroot.dropsheet.animate('opacity', 1, 300, false, {motion: 'easeout'});
+        on mouseover
+          classroot.dropdown.over.animate('opacity', 1, 300, false);
+        on mouseout 
+          classroot.dropdown.over.animate('opacity', 0.01, 300, false);
+      viewname dropsheet
+        #resizeable
+        xywh 3, 2, [=sheetsize[0]=], 0 
+        opacity 0
+        bgcolor [=sheetcolor=]
+        clip
+        scroll y
+        vert
+          view
+            datapath ${classroot.path}
+            width ${classroot.dropsheet.width-13} 
+            blueRollover
+              on click
+                classroot.dropdown.over.animate('opacity', 0.2, 150, false);
+                classroot.dropsheet.animate('height', 0, 150, false, {motion: 'easein'});
+                classroot.dropsheet.animate('opacity', 0, 150, false, {motion: 'easein'});
+                classroot.selected.textfield.setText(parent.item.field.getText());
+                classroot.setAttribute('value', parent.item.field.getText());
+                classroot.doAfter();
+            viewname item
+              wof parent
+              txt $path{classroot.elem}
+                name field
+
+#LzModeManager.makeModal(classroot.dropsheet);
+#LzModeManager.release(classroot.dropsheet);
+
+@makeMessageDialogClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      opacity 0
+      def display, msg, time
+        this.pane.field.setText(msg);
+        this.animate('opacity', 0.8, 200, false);
+        if(!time){
+          time = 3000
+        }
+        this.hideDelegate = new LzDelegate(this, "hide");
+        LzTimer.addTimer(this.hideDelegate, time);
+        
+        
+      def hide
+        this.animate('opacity', 0, 2500, false);
+        
+      roundbox
+        fgcolor 0x000022
+      viewname pane
+        centered
+        txt No Message
+          name field
+          font [=..ZloUI.communicate=]
+          fontsize 14
+          fgcolor white
+          
+@makeMessageModalClass
+  Class
+    name: [=name=]
+    extends: view
+    contains:
+      set opacity 0
+      clickable true
+      def display, msg
+        this.window.pane.field.setText(msg);
+        this.animate('opacity', 0.8, 200, false);
+        
+      def hide
+        this.animate('opacity', 0, 200, false);
+        
+      roundbox
+        fgcolor 0x000022
+      pillbox
+        xy ${parent.width-this.width-5}, 5
+        on click 
+          classroot.hide();
+          
+      viewname window
+        margin 15
+        clipview
+          fullsize
+          name pane
+          txt No Message
+            width ${parent.width-13}
+            multiline
+            fgcolor white
+            name field
+        #scroll y
+          
+        
+@disclosureTriangle
+  new [=..disclosureTriangle=]
+    pass
+    
+@makeDisclosureTriangleClass
+  Class
+    name: [=name=]
+    contains:
+      wh 10, 10
+      stretch
+      centered
+      loadResource [=.triangleup=], [=upicon=]
+      loadResource [=.triangledown=], [=downicon=]
+      viewname triangleup
+        img [=.triangleup=]
+      viewname triangledown
+        visible false
+        img [=.triangledown=]
+      on init
+        this.state = false;
+      on click
+        this.triangleup.setVisible(this.state);
+        this.triangledown.setVisible(!this.state);
+        this.state = !this.state;
+        
+        
+@makeAccordianClass
+  Class
+    name: [=name=]
+    params:
+      string: title=No Title, body=No Body, highlightcolor=0x2c81a8, labelcolor=0xf7f310
+      string: labelfont=[=..ZloUI.axelrod=], bodyfont=[=..ZloUI.communicate=], bodycolor=0xf7f310
+      number: labelsize=24, bodysize=12
+    contains:
+      clip
+      valign
+      height ${this.label.field.getTextHeight()}
+
+      on click
+        var bodyH = this.content.field.getTextHeight();
+        var labelH = this.label.field.getTextHeight();
+        this.animate('height', labelH+bodyH, 300, false);
+        this.content.setVisible(true);
+      on mouseover
+        this.label.backing.animate('opacity', 0.4, 300, false);
+      on mouseout
+        this.label.backing.animate('opacity', 0.001, 300, false);
+      
+      #?Label 
+      viewname label
+        width ${classroot.width}
+        roundbox
+          fgcolor ${classroot.labelcolor}
+          opacity 0.001
+          name backing
+          height ${parent.field.getTextHeight()}
+        txt ${classroot.title}
+          name field     
+          font ${classroot.labelfont}
+          fontsize 24
+          middle
+    
+      #?Body
+      view
+        name content
+        visible false
+        width ${classroot.width}
+          
+        roundbox
+          fgcolor ${classroot.bodycolor}
+          opacity 0.2
+          on click
+            var labelH = classroot.label.field.getTextHeight();
+            classroot.animate('height', labelH, 300, false);
+            parent.setVisible(false);
+          
+        txt ${classroot.body}
+          name field  
+          multiline
+          font ${classroot.bodyfont}
+          width ${parent.width}
+          fontsize 13
+          fgcolor black
+          
+@makeRoundedText
+  Class
+    name: [=name=]
+    params:
+      string: label, color=black
+    contains:
+      height ${field.getHeight()*1.5}
+      event onmouseover
+        this.box.animate('opacity', 0.8, 150, false);
+      event onmouseout
+        this.box.animate('opacity', 0.2, 300, false, {motion:'easein'});
+        
+      roundbox
+        name box
+        opacity 0.2
+        fgcolor ${classroot.color}
+        
+      txt ${classroot.getAttribute('label')}
+        name field
+        fgcolor white
+        centered
+                        
+#!PLEASE MAKE ME PRETTIER!
+@makeProgressBarClass
+  Class
+    name: [=name=]
+    contains:
+      def setValue, value
+        status.setAttribute('width', value * this.width / 100);
+        percent.setText(Math.round(value) + '%');
+        
+      bgcolor 0x666666
+      view
+        xy 1, 1
+        wof parent
+        height 22
+        bgcolor 0xffffff
+      viewname status
+        xy 1, 1
+        height 22
+        bgcolor 0xbbbbff
+      txt %
+        center
+        name percent
+        xy 5, 3
+        fgcolor 0x6666ff
+
+  

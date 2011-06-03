@@ -1,0 +1,70 @@
+
+# Filename: ZloUI.skin
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+#)background image
+#@Background backgrounds/peacesky.jpg
+@Background backgrounds/graphite.jpg
+@BackgroundOpacity 1
+@BackgroundIcon backgrounds/starburstgrnrd2.png
+
+#)start bar graphics
+@GlassBar aqua/aquabar1.jpg
+@GlassBarL aqua/aquabar1_leftcap.png
+@GlassBarR aqua/aquabar1_rightcap.png
+
+#)Window decoration
+@WindowBacking osxwin/newstyle/backing.png
+
+#)Various Icons
+@VirtualManagerIcon icons/tv.png
+@MessageTrayIcon icons/mail.png
+@HelpTrayIcon icons/help_small.png 
+@LoginTrayIcon icons/padlock1.png
+@UsersGroupsTrayIcon icons/usersandgroups.png
+
+#)Tints
+@ActiveWinTint 0, 0, 30
+@ActiveSysTrayTint 50, 0, 0
+@TaskBarTint 15, 15, 18
+@TaskBarDownTint -30, -30, -30
+
+#)Message Modals
+@MessageModalWidth 500, 400
+@MesageDialogWidth 400, 100
+
+#)System Modals
+@SysTrayIconSize 20, 20
+@ModalOpacity 0.92
+@ModalTitleFontSize 18
+@ModalTitleBackgroundColor 0xddddff
+@ModalTitleBackgroundOpacity 0.7
+@ModalTitleTextColor white
+
+#)Windows
+@WindowShadowColor 0x222222
+@WindowShadowOpacity 0.15
+@WindowTitleFontSize 12
+@WindowOpacitySpeed 250
+
+#)Desktop Switchers
+@DesktopSwitcherOpacity 0.8
+@DesktopSwitcherBackgroundColor 0x111144
+@DesktopSwitcherBackgroundOpacity 0.7
+@DesktopSwitcherTextFontSize 16
+@DesktopSwitcherTextColor 0xccffcc
+@DesktopSwitcherTextFont ZloUI_communicate
+@DesktopSwitcherSpeed 500
+
+#)SystemTabs
+@SystemTabFontSize 14
+@SystemTabOffOpacity 0.5
+@SystemTabOnOpacity 0.95
+@SystemTabOutSpeed 600
+@SystemTabOpacitySpeed 600
+
+
+
+
+ 

@@ -1,0 +1,12 @@
+
+# Filename: graphical.skin
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+@Background backgrounds/colorBands.jpg
+@DesktopSwitcherBackgroundColor 0x000011
+
+
+
+
+ 

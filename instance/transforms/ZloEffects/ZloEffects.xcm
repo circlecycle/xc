@@ -1,0 +1,56 @@
+
+# Filename: ZloEffects.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include ZloBase
+
+@tint            
+  initTint [=.tint=], [=0=], [=1=], [=2=]
+  oninit this.setColorTransform([=.tint=]);
+
+#orollover color, opacity, time
+
+@orollover
+  view
+    fullsize
+    bgcolor [=0=]
+    opacity 0.01
+    on mouseover
+      this.setAttribute('bgcolor', '[=0=]');
+      this.animate('opacity', [=1=], [=2=], false, {motion:'easeout'});
+    on mouseout
+      this.animate('opacity', 0.01, [=2=], false, {motion:'easeout'});
+    pass
+      
+@redRollover     orollover 0xff0000, 0.4, 200
+@blueRollover    orollover 0x0000ff, 0.4, 200
+@whiteRollover   orollover 0xdddddd, 0.4, 200
+@blackRollover   orollover 0x000000, 0.4, 200
+
+@oRoundedRollover
+  roundbox
+    fgcolor [=0=]
+    opacity 0.01
+    event onmouseover
+      this.animate('opacity', [=1=], [=2=], false);
+    event onmouseout
+      this.animate('opacity', 0.01, [=2=], false);
+    pass
+
+@resizeable
+  prepend onmousedown [=.sizer=].apply();
+  prepend onmouseup [=.sizer=].remove();
+  new resizestate set name [=.sizer=]
+  
+@dragstate
+  new dragstate set name [=0=]
+    set drag_axis [=1=]
+    
+=dragstate dummy, x
+  
+@animateover
+  on mouseover
+    [=0=].animate([=`1`=], [=3=], [=4=], false);
+  on mouseout
+    [=0=].animate([=`1`=], [=2=], [=4=], false);

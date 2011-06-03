@@ -1,0 +1,27 @@
+
+
+start
+  Object [~..KeyboardKey~]
+    number sx
+    number sy
+    string letter
+    string fieldid
+    
+    wh ${this.sx}, ${this.sy}
+    bgcolor 0xffffff  
+    txt ${classroot.letter}
+      centered
+    blueRollover
+      on click
+        eval(classroot.fieldid).append(classroot.letter);
+        this.setAttribute('bgcolor', '0xff0000');
+        
+@KeyboardKey
+  new [~..KeyboardKey~]
+    set fieldid [=fieldid=]
+    set letter [=letter=]
+    set sx [=wh[0]=]
+    set sy [=wh[1]=]
+      
+
+    

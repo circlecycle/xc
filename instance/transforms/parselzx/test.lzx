@@ -1,0 +1,124 @@
+<!--
+    Copyright 2004-2007 Laszlo Systems, Inc.  All Rights Reserved.
+    Unauthorized use, duplication or distribution is strictly prohibited.
+    This software is the proprietary information of Laszlo Systems, Inc.
+    Use is subject to license terms.
+-->
+<library>
+
+    <include href="mailfolder.lzx" />
+
+    <!--- A class that contains aggregated messages that actually exist in other
+          'real' folders. For example, a search folder is a virtual folder. -->
+    <class name="mailvirtualfolder" extends="mailfolder" isvirtual="true">
+
+        <!--- The virtual token that represents this virtual folder on the
+              server. This is returned by a fresh folderlist. See mh_msgheaderlist
+              datahandler for details. -->
+        <attribute name="vtoken" value="$once{null}" type="string" />
+
+        <!--- Name to show for virtualfolder. Default is 'Search'. -->
+        <attribute name="displayname" value="Search" type="string" />
+
+        <!--- List of folders, separated by two folder separator characters. For
+              example, assuming a folder separator is '/', folders should looks
+              something like 'INBOX//Trash//MyFolder/MySubfolder' -->
+        <attribute name="folders" value="$once{null}" type="string" />
+        
+        <!--- Comma separated list of mail fields to be searched. For example,
+              'subject,from,recipients'. -->
+        <attribute name="fields" value="$once{null}" type="string" />
+        
+        <!--- The text to search in list of fields. -->
+        <attribute name="searchtext" value="$once{null}" type="string" />
+
+        <!--- Array of folders returned from search.
+              @keywords private -->
+        <attribute name="farr" value="$once{null}" />
+
+        <!--- Parse double-folder separator list of folder names and get an
+              array of folder names.
+              @param String folders: double folder separator separated list of
+              folders, like "INBOX//Drafts//My Folder". 
+              @return an array of folder names. -->
+        <method name="getFolders" args="folders"><![CDATA[
+            var sep = mailmodule.config.folderseparator;
+            return folders.split(sep+sep);
+            ]]>
+        </method>
+
+        <!--- Return msg count text to display. -->
+        <method name="getMsgCountText"><![CDATA[
+            var msg = '';
+            if (this.foldernode) {
+                var fname = '';
+                var sep = mailmodule.config.folderseparator;
+                if (this.farr.length > 1) {
+                    fname = 'multiple folders';
+                }  else {
+                    fname = '<b>' + this.farr[0] + '</b>';
+                }
+
+                var msgcount = this.foldernode.attributes.msgcount;
+                var unreadcount = this.foldernode.attributes.unreadcount;
+                var msgText = 'message' + ( msgcount == 1 ? '' : 's' );
+                if (msgcount == 0) {
+                    // If no message was found in any folder, see if the search
+                    // was being done on a single folder
+                    fname = ' ';
+                    if (this.folders && this.folders.indexOf(sep+sep) == -1) {
+                        fname += 'in ' + this.folders + ' ';
+                    } 
+                    msg = 'No ' + msgText + ' found' + fname + 'for <b>"' 
+                        + this.searchtext + '"</b>.';
+                } else {
+                    msg = 'Found ' + msgcount + ' ' + msgText
+                        + ' in ' + fname + ' for <b>"' + this.searchtext + '"</b>.';
+                }
+            }
+
+            return msg;
+            ]]>
+        </method>
+
+        <!--- @param String fname: folder fullname 
+              @return true if this virtual folder has messages from folder
+              called fname, else false. -->
+        <method name="hasFolderReference" args="fname">
+            for (var i in farr) {
+                if (farr[i] == fname) return true;
+            }
+            return false;
+        </method>
+
+        <!--- Helper function to return folder name.
+              @return the name of the folder of the current message within the
+              virtual folder. -->
+        <method name="getName">
+            var curheader = this.getCurrMsgHead();
+            return curheader.attributes.folder;
+        </method>
+
+        <!--- Virtual folder should always return true for this method. -->
+        <method name="isvalid">
+            return true;
+        </method>
+
+        <!--- Checks if virtual folder contains messages from a particular
+              folder.
+              @param String fullname: the fullname of the folder to check.
+              @return true if virtual folder contains messages from a particular
+              folder, else false.-->
+        <method name="hasMessagesFrom" args="fullname">
+            var farr = this.farr;
+            if (farr) {
+                for (var i in farr) {
+                    if (farr[i] == fullname) return true;
+                }
+            }
+            return false;
+        </method>
+
+    </class>
+
+</library>

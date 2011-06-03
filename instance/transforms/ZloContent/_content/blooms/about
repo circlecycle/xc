@@ -1,0 +1,16 @@
+Current generic XML templating systems are becoming increasingly awkward as emphasis is shifted to application development in markup and new ways of making and distributing programs are needed to effectively work with generic XML application-level interfaces.  This is all the more urgent with the glue of XML becoming a wide-spread target of programmatic configuration -- the creation of XML APIs into various other products means that wiser XML equals wiser apps.
+
+XC in a nutshell:
+- Python and whitespace-XML combined 
+- an abstraction and compilation engine 
+- an integrated server system based on HTTP 
+- persistence, security, sessions, identity 
+- multi-application integration tool; app mashups 
+- a unified meta-language binding all of the above 
+
+The exciting thing about the XC system is its completeness as an abstraction of the full web-stack.  When applications depend on XML a single pattern may span multiple languages in multiple files in awkward ways. XC offers templating taken to logical and minimal limits.  It owes its roots to Zope Page Templates and even if they bear only moderate resemblances in theory, if not in ease, there is nothing XC does that general purpose templating can not.  The concepts are DOM based and accessible.  The XC philosophy begins to shine when you consider productivity, workflow, reusability, and framework generation.  RAD techniques have been considered, refined, and solidified into more than a web server; it's a coherent whole. 
+
+XC unifies application development by orchestrating disparate application components under a modular concept unlike existing templating systems, thereby reducing the effort and time to create dynamic web applications by a magnitude while offering clear readability. As it's first runtime target (other then HTML) it has been integrated into the OpenLaszlo framework which offers the ability to build complex web-applications that are instantly reusable in whole or part along with server data sources the application uses, seamlessly compiled together.  
+
+Another side-effect is instant multi-project wide control of functionality and display in large applications (CSS offers a similar analogy when considering how it controls the look, if not the functionality, of a site client side). There are many more features; XC uses a batteries-included philosophy.
+

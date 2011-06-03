@@ -1,0 +1,74 @@
+
+# Filename: tester.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+include std
+
+start
+  new div using admin.status
+  
+finish
+  print done done and done: owner [=$ownername=]
+  print realtime text: owner [=$ownername~]
+
+@show print
+
+@param show [=0=] - [=1=] - [=2=] / [=`2`=]
+=param red, green, blue
+
+@shell
+  loop [=.make=] in [=zip(color.array, make.array)=]
+    new div 
+      set style 
+        background: [~[=.make=][0]~];
+        margin: [~[=.make=][1]~]px;
+      [=content=]
+  
+  print Other vals:
+  print [=some[0]=]
+  print [=some[1]=]
+  print [=some[2]=]
+  print [=thing[0]=] - [=thing[1]=] - [=thing[2]=]
+  
+=shell
+  make: 3, 9, 27
+  color: red, green, blue
+  content: 
+    text Hello there World
+  some: 1, 22, 333
+  thing:
+    one text
+    two text 
+    three text
+    
+@optional
+  new div
+    set style color: [=?color=]
+    text
+      [=text=]
+    [=?morerules=]
+    
+@subslot
+  print [=test['one']=]
+  print [=test['two']=]
+  print [=me=]
+  
+#!still have a problem with defining *defaults* for subslots. Last problem with that system.
+=subslot
+  there: one
+  
+  
+@multioptional
+  new div
+    set style
+      [=??style=]
+    text
+      [=text=]
+    new div
+      text 
+        [=???text2=]
+      
+     
+
+  

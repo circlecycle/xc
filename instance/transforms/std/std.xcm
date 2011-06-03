@@ -1,0 +1,44 @@
+
+# Filename: std.macro
+# Copyright: 2005-2007 James Robey
+# Project: XC (please reference the XC.license file for copyright details.)
+
+#)language
+@script init script tag
+@once init block once
+@fragment new fragment using
+
+#)html (move me)
+@div new div
+@span new span
+@br new br
+@table new table
+@tr new tr
+@td new td
+@align set align
+       
+@style prepend style
+
+@id set id
+@name set name
+@href new a
+@bold new b text
+@ital new i text
+@undl new u text
+
+@ajax 
+  new a using js.ajax [=path=]
+    set replace [=replace=]
+    set send [=?send=]
+    set href [=?text=]
+    text [=?text=]
+    
+@field
+  new input
+    set id [=?id=]
+    set name [=?name=]
+    set type [=?type=]
+    set value [=?value=]
+    
+#=ajax
+#  send: 

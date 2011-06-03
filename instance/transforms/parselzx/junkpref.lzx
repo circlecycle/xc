@@ -1,0 +1,507 @@
+<!-- Copyright 2005-2007 Laszlo Systems, Inc.  All Rights Reserved.
+     Unauthorized use, duplication or distribution is strictly prohibited.
+     This software is the proprietary information of Laszlo Systems, Inc.
+     Use is subject to license terms. -->
+<library>
+
+    <include href="preflistitem.lzx"/>
+
+    <include href="../components/mradiogroup"/>
+
+    <!-- ============================
+         == blockedsenderitem
+         ============================ -->
+    <class name="blockedsenderitem" extends="preflistitem" 
+           editable="false">
+
+        <handler name="ondata">
+            if (! this.data) return;
+            var email = data.getProperty("email");
+            this.setAttribute("text", email);
+        </handler>
+
+    </class>
+
+
+    <!-- ============================
+         == junkprefs
+         ============================ -->
+    <class name="junkprefs" extends="preferenceform">
+        <!-- ====================
+             ====   METHODS  ====
+             ==================== -->
+
+        <!--- Model used for preference. -->
+        <junkmailprefmodel name="junkmailmodel">
+            <handler name="oninit">
+                if (gLogin.action == "LoggedIn") this.getDetailsByIndex(0);
+            </handler>
+        </junkmailprefmodel>
+
+        <!--- Hide/show basic vs blocked sender panels -->
+        <method name="selectPanel" args="panel">
+            this.blockView.setVisible(panel == this.blockView);
+            this.basicView.setVisible(panel == this.basicView);
+            if (panel == blockView) {
+                vbar.setY( 26 );
+            } else {
+                vbar.setY( 5 );
+            }
+            this.selectedPanel = panel;
+        </method>
+
+        <!--- Submit changes to preferences. -->
+        <method name="submit">
+            <![CDATA[
+            
+            //validate parts of model to ensure submission can occur. This is entirely client-side - no response
+            //from the server causes an error, just the value from the configuration.
+            
+            var numBlocked = this.blockView.blockOn.blockedSendersControl.blocklist.modellist.blockedModels.length;
+            if(numBlocked < lzmail.config.maxblockedsenders){
+                this.commit();
+                this.junkmailmodel.commit();
+                if ( this.blockView.visible ) {
+                    this.blockView.blockOn.blockedSendersControl.blocklist.modellist.commit();
+                }
+            }else{
+                this.rollback();
+                var msg = "Sorry, there is a limit of "+lzmail.config.maxblockedsenders+" blocked senders.";
+                gDialogMan.showAlert(msg, lzmail.prefPanel);
+            }
+            ]]>
+        </method>
+
+        <!--- Revert changes for blockedlist. -->
+        <method name="rollback">
+            super.rollback();
+            //------------------------------------------------------------
+            // TODO [2007-05-01 pkang]: have a way to clear model changes.
+            //------------------------------------------------------------
+//            this.junkmailmodel.rollback();
+            if ( this.blockView.visible ) {
+                this.blockView.blockOn.blockedSendersControl.blocklist.modellist.reset();
+            }
+        </method>
+
+        <!-- ====
+             Selector for what junk prefs to edit
+             ==== -->
+        <view bgcolor="0x77787b" x="131" y="-3" width="1" height="7" />
+        <view y="4">
+            <view width="132" height="42" bgcolor="0x77787b"/>
+            <view width="130" height="40" x="1" y="1" bgcolor="white">
+                <selectionmanager name="selman" toggle="false">
+                    <method name="isMultiSelect"></method>
+                    <method name="isRangeSelect"></method>
+                    <method name="select" args="item">
+                        if ( classroot.changed ) {
+                            this._selectItem = item;
+                            var msg = "Save your changes?";
+                            gDialogMan.showConfirm(msg, classroot.classroot, 
+                                                   new LzDelegate(this, "_listener"));
+                        } else {
+                            super.select(item);
+                            classroot.selectPanel( item.name == "basic" 
+                                                  ? classroot.basicView
+                                                  : classroot.blockView );
+                        }
+                    </method>
+                    <!--- @keywords private -->
+                   <method name="_listener" args="isok">
+                        if (isok) {
+                            classroot.submit();
+                        } else {
+                            classroot.rollback();
+                        }
+                        this.select(this._selectItem);
+                        this._selectItem = null;
+                    </method>
+                </selectionmanager>
+                <preflistitem text="Junk Mail Filter" name="basic" selected="true"/>
+                <preflistitem text="Blocked Senders" name="block" y="20" />
+            </view>
+            <view bgcolor="0x77787b" x="131" y="42" height="210" width="1"/>
+        </view>
+        
+        <!-- Green dots -->
+        <view name="basicgreendot" resource="green_dot" visible="false" x="118" y="11" />
+        <view name="blockgreendot" resource="green_dot" visible="false" x="118" y="31" />
+
+
+        <!-- grey bar on pan selection widget -->
+        <view name="vbar" bgcolor="0xF7F7F7" x="131" y="5" height="19" 
+              width="1"/>
+        
+
+        <view name="basicView" y="0" x="140" width="500">
+            <!-- Vertical and Horizontal lines -->
+            <view bgcolor="0xC4C4C4" y="43" height="1" width="440"/>
+            <view bgcolor="0xC4C4C4" x="140" y="80" height="37" width="1"/>
+            <view bgcolor="0xC4C4C4" y="130" height="1" width="440"/>
+
+            <!-- Turn off or on protection option -->
+            <text multiline="true" width="440" y="2">
+                The <b>Junk Mail Filter</b> detects junk mail using rules based on a number<br />
+                of factors, including the reporting of junk mail from other people.
+            </text>
+            <view y="55">
+                <mradiogroup name="junk_filter_enabled"
+                             model="classroot.junkmailmodel">
+                    <method name="applyData" args="d">
+                        var lastChanged = classroot.changed;
+                        super.applyData(d);
+                        classroot.setChanged(lastChanged);
+                    </method>
+                    <view onclick="parent.setValue(0)">
+                        <wtradiobutton y="3" value="0" 
+                                       group="$once{parent.parent}"/>
+                        <text x="15"><b>OFF:</b></text>
+                        <text x="50">junk mail is placed in my inbox</text>
+                    </view>
+                    <view onclick="parent.setValue(1)" y="25">
+                        <wtradiobutton y="3" value="1"
+                                       group="$once{parent.parent}"/>
+                        <text x="15"><b>ON:</b></text>
+                        <text x="50">junk mail is...</text>
+                    </view>
+                </mradiogroup>
+    
+                <!-- What to do with junk mail radio buttons -->
+                <!-- TODO: apply model - what model is this property in? -->
+                <view y="28" x="150" name="junkOn">
+                    <attribute name="enabled"
+                               value="${parent.junk_filter_enabled.value ? true : false}"/>
+                    <mradiogroup enabled="false" name="junk_action"
+                                 model="classroot.junkmailmodel">
+                        <method name="applyData" args="d">
+                            var lastChanged = classroot.changed;
+                            super.applyData(d);
+                            classroot.setChanged(lastChanged);
+                        </method>
+                        <simplelayout axis="y" spacing="5"/>
+                        <view>
+                            <handler name="onclick">
+                                if (parent.parent.enabled) {
+                                    parent.setValue('FILE_INTO_JUNK_FOLDER');
+                                }
+                            </handler>
+                            <wtradiobutton y="3"
+                                value="$once{'FILE_INTO_JUNK_FOLDER'}"
+                                text=""
+                                group="$once{parent.parent}"/>
+                            <text x="15">placed in the</text>
+                            <view resource="mail_folder_junk_rsc"
+                                  x="94" y="3"/>
+                            <text x="112">Junk Mail Folder</text>
+                        </view>
+                        <view>
+                            <handler name="onclick">
+                                if (parent.parent.enabled) {
+                                    parent.setValue('DELETE_IMMEDIATELY');
+                                }
+                            </handler>
+                            <wtradiobutton
+                                group="$once{parent.parent}"
+                                value="$once{'DELETE_IMMEDIATELY'}"
+                                text=""/>
+                            <text x="15">deleted immediately</text>
+                        </view>
+                    </mradiogroup>
+                    <handler name="onenabled" args="isEnabled">
+                        this.junk_action.setAttribute('enabled', isEnabled);
+                        this.parent.junkOnOverlay.setAttribute('visible', !isEnabled);
+                        classroot.basicgreendot.setAttribute("visible", isEnabled);
+                    </handler>
+                </view>
+                <view name="junkOnOverlay" visible="true" y="20" x="145" opacity=".6" bgcolor="0xFCFCFC" height="45" width="255"/>
+            </view>
+            <view y="140">
+                <text x="0" y="0"><b>How can I report Junk Mail?</b></text>
+                <text x="0" y="20" multiline="true" width="440">
+                    If you receive a message that you believe is junk, then select the<br/>
+                    message and click the Junk button in the toolbar. This automatically<br/>
+                    moves the message into the junk folder and reports it as junk.
+                </text>
+                <view y="73" resource="toolbar_junk"/>
+            </view>
+
+        </view>
+
+        <view name="blockView" y="0" x="140" visible="false">
+        
+            <!-- Turn on/off blocked senders -->
+            <view name="blockenabler" layout="axis: y; spacing: 8">
+                <text><b>Blocked Senders</b></text>
+
+                <view bgcolor="0xC4C4C4" height="1" width="216"/>
+
+                <!--- TODO [2007-04-19 pkang]: Select right option below using preference. -->
+                <mradiogroup name="blocked_senders_enabled"
+                             model="classroot.junkmailmodel">
+                    <method name="applyData" args="d">
+                        var lastChanged = classroot.changed;
+                        super.applyData(d);
+                        classroot.setChanged(lastChanged);
+                    </method>
+                    <!-- off -->
+                    <view onclick="parent.setValue(0)">
+                        <wtradiobutton y="3" value="0"
+                                       group="$once{parent.parent}"/>
+                        <text x="15"><b>OFF:</b></text>
+                        <text x="50">Blocked senders is disabled</text>
+                    </view>
+
+                    <!-- on  -->
+                    <view y="25" onclick="parent.setValue(1)">
+                        <wtradiobutton y="3" value="1"
+                                       group="$once{parent.parent}"/>
+                        <text x="15"><b>ON:</b></text>
+                        <text x="50" multiline="true" width="180">Blocked mail is deleted<br/> immediately</text>
+                    </view>
+                    <handler name="onvalue">
+                        classroot.blockView.blockOn.blockedSendersControl.setEnabled(value);
+                    </handler>
+                </mradiogroup>
+
+                <view bgcolor="0xC4C4C4" height="1" width="216"/>
+
+                <text width="210" multiline="true">
+                    The Blocked Senders list can contain email addresses
+                    like <b>name@company.com</b> as well as whole
+                    domains such as <b>company.com</b>, where email from
+                    everyone at that domain would be blocked.
+                </text>
+
+            </view>
+                
+            <view name="blockOn" x="222">
+            
+                <text x="6">Enter Email Address or Domain:</text>
+                
+                <view y="25" name="blockedSendersControl">
+                    <method name="setEnabled" args="isEnabled">
+						if( !isEnabled ) {
+							blocklist.listview.selman.clearSelection();
+						}
+                        classroot.blockgreendot.setAttribute("visible", isEnabled);
+                        classroot.blockView.blockOnOverlay.setAttribute("visible", !isEnabled);
+                    </method>
+                    
+                    <view height="18" width="250" bgcolor="0xC4C4C4"/>
+                    <inputtext name="email" bgcolor="0xFFFFFF" width="183" y="1" x="1" height="18">
+					
+						<!-- The font on the inputtext isn't getting set correctly until some action happens on it
+							such as clearText() even though it's formatting properties are inheritted from the canvas.
+							So calling clearText() when the inputtext is initialized. -->
+						<handler name="oninit">
+							this.clearText();
+						</handler>
+						
+                        <handler name="onkeydown" args="key">
+                            if (key == 13) this.add();
+                        </handler>
+                        <method name="add">
+                            if( parent.blocklist.addBlockedSender() ) {
+                                this.clearText();
+                            }
+                            LzFocus.setFocus(this);
+                        </method>
+                    </inputtext>
+                    <wtstylishbutton name="block" text="Block" x="184" width="65" 
+                                     onclick="parent.email.add()" focusable="false"/>
+                                 
+                    <!-- Blocked sender list -->
+                    <view height="177" width="250" y="25" bgcolor="0xC4C4C4"/>
+                    <view name="blocklist" height="177" width="250" y="25" x="1"
+                          clip="true" bgcolor="0xFFFFFF">
+
+                        <!-- Add a new blocked sender -->
+                        <!-- returns true if the address is added or already exists -->
+                        <method name="addBlockedSender" args="email"><![CDATA[
+                            var email = gUtil.trim( parent.email.getText() );
+                            var valid = gUtil.isEmailValid(email);
+                            if( !valid ) {
+                                valid = gUtil.isDomainValid(email);
+                            }
+                            if( !valid ) {
+                                gDialogMan.showAlert('Invalid email address or domain',
+                                     lzmail.prefPanel, null, true);
+                                return false;
+                            }
+                            if ( email ) {
+                                var model;
+                                var bm = this.modellist.blockedModels;
+
+                                // Don't save if we already have it in blockedModels array.
+                                var lowerEmail = email.toLowerCase();
+                                for ( var i in bm ) {
+                                    var cmpEmail = bm[i].getProperty("email");
+                                    if ( cmpEmail && lowerEmail == cmpEmail.toLowerCase() ) {
+                                        if ( bm[i].deleted ) {
+                                            bm[i].setDeleted( false );
+                                            this.listview.updateView();
+                                        }
+										this.listview.scrollToItem(cmpEmail);
+                                        return true;
+                                    }
+                                }
+
+                                model = gModelFactory.getModel( blockedsendermodel );
+                                model.setProperty("email", email);
+                                this.modellist.blockedModels.push( model );
+                                this.listview.updateView();
+								this.listview.scrollToItem(email);
+                                return true;
+                            }
+                            return false;
+                            ]]>
+                        </method>
+
+                        <!-- Remove an existing blocked sender -->
+                        <method name="removeSelectedBlockedSenders">
+                            // selection is an array of positions
+                            var selection = listview.selman.getSelection();
+                            if ( selection.length ) {
+                                for ( var i in selection ) {
+                                    var sv = listview.subviews[selection[i]];
+                                    sv.data.setDeleted( true );
+                                }
+                                listview.updateView();
+                                listview.selman.clearSelection();
+                            }
+                        </method>
+
+                        <replicator name="listview" layout="axis: y">
+
+                            <method name="ignoreCaseSort" args="m1,m2"><![CDATA[
+                                var str1 = m1.getProperty("email");
+                                var str2 = m2.getProperty("email")
+                                if (str1) str1 = str1.toLowerCase();
+                                if (str2) str2 = str2.toLowerCase();
+                                if (str1 < str2) return -1;
+                                if (str1 > str2) return 1;
+                                return 0;
+                                ]]>
+                            </method>
+							
+							<method name="scrollToItem" args="email">
+								<![CDATA[
+								for ( var i=0; i<nodes.length; i++ ) {
+									if( nodes[i].getProperty("email") == email ) {
+										break;
+									}
+								}
+								this.ensureInView(i);
+								]]>
+							</method>
+
+                            <method name="updateView">
+                                this.setNodes( parent.modellist.blockedModels.sort(ignoreCaseSort) );
+                                classroot.setAttribute( "changed", true );
+                            </method>
+
+                            <method name="setNodes" args="nodes"><![CDATA[
+                                nodes = nodes.concat();
+                                for ( var i=0; i < nodes.length; i++ ) {
+                                    if ( nodes[i].deleted ) {
+                                        nodes.splice(i, 1);
+                                        --i;
+                                    }
+                                }
+                                super.setNodes( nodes );
+                                ]]>
+                            </method>
+
+                            <replicatorselectionmanager name="selman"/>
+
+                            <blockedsenderitem width="250"/> 
+
+                        </replicator>
+
+
+                        <modeldatalist name="modellist" sort="email"
+                                       pagesize="${lzmail.config.maxblockedsenders}"
+                                       modelclass="blockedsendermodel">
+                            <attribute name="blockedModels" />
+
+                            <!-- Used when models from this datalist are committed. The commit
+                                 method counts the number of models submitted. The onlength
+                                 handler counts the number of times it receives an event and
+                                 when the counter reaches zero, calls createNoteModels. Set to 1
+                                 initially for the first data request to the server. -->
+                            <attribute name="committedCounter" value="1" />
+
+                            <handler name="oninit" method="_makeRequest"/>
+                            <method name="_makeRequest">
+                                this.initBinder = this.get( 0 );
+                            </method>
+
+                            <handler name="onlength">
+                                if ( this['initBinder'] ) {
+                                    initBinder.recycle();
+                                    delete this.initBinder;
+                                }
+
+                                --committedCounter;
+
+                                if ( this.length == null ) {
+                                    gDialogMan.showAlert("An error occurred saving blocked senders", 
+                                                         classroot);
+                                }
+
+                                if (committedCounter == 0) this.reset();
+                            </handler>
+
+                            <method name="createBlockedModels"><![CDATA[
+                                this.blockedModels = [];
+                                var dbinder = this.get( 0 );
+                                for( var i = 0; i < this.length; i++ ){
+                                    dbinder.setPosition( i );
+                                    blockedModels.push( gModelFactory.getModelFromData(dbinder.data) );
+                                }
+                                dbinder.recycle();
+                                ]]>
+                            </method>
+
+                            <method name="commit"><![CDATA[
+                                for ( var i=0; i < this.blockedModels.length; i++ ) {
+                                    if ( blockedModels[i].commit() ) ++committedCounter;
+                                }
+                                classroot.setAttribute( "changed", false );
+                                ]]>
+                            </method>
+
+                            <method name="reset">
+                                var lastChanged = classroot.changed;
+                                this.createBlockedModels();
+                                parent.listview.setNodes( this.blockedModels );
+                                this.committedCounter = 0;
+                                classroot.setAttribute( "changed", lastChanged );
+                            </method>
+
+                        </modeldatalist>
+                        <scrollbar name="sendersscroll" visible="true"/>
+                    </view>
+                    <view height="1" width="250" y="25" bgcolor="0xC4C4C4"/>
+                    <view height="18" width="250" y="199" bgcolor="0xC4C4C4"/>
+                    <view height="16" x="1" y="200" width="248" bgcolor="#EEEEEE"/>
+                    <wtstylishbutton name="unblock" text="Unblock" x="184" y="199" width="65" 
+                                 onclick="parent.blocklist.removeSelectedBlockedSenders()" 
+                                 focusable="false"/>
+                </view>
+            </view>
+
+            <view name="blockOnOverlay" 
+                  x="$once{parent.blockOn.x - 3}" 
+                  y="$once{parent.blockOn.y - 2}" 
+                  width="$once{parent.blockOn.width + 6}"  
+                  height="$once{parent.blockOn.height + 4}" 
+                  bgcolor="0xFCFCFC" opacity=".6" clickable="true" 
+                  showhandcursor="false" />
+
+        </view>
+
+    </class>
+
+</library>

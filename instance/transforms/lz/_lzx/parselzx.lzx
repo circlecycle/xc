@@ -1,0 +1,313 @@
+<canvas debug="true" proxied="false"><script id="XC_script">var ZloData_securityset_response = false;
+function ZloData_securityset_send(obj, context, funcname){
+  ZloData_securityset.setQueryString(null);
+  ZloData_securityset.setQueryString(obj);
+  if(context != null){
+    ZloData_securityset_response = new LzDelegate(context, funcname);
+  }else{
+    ZloData_securityset_response = false;
+  }
+  ZloData_securityset.doRequest();
+  ZloData_loadingflag.setOpacity(1);
+  ZloData_loadingflag.animate('height', 20, 0, false);
+}
+var ZloWidgets_sizerTint = new Object;
+ZloWidgets_sizerTint.rb = '50';
+ZloWidgets_sizerTint.gb = '0';
+ZloWidgets_sizerTint.bb = '0';
+var ZloWidgets_noTint = new Object;
+ZloWidgets_noTint.rb = '0';
+ZloWidgets_noTint.gb = '0';
+ZloWidgets_noTint.bb = '0';
+var parselzx_history_response = false;
+function parselzx_history_send(obj, context, funcname){
+  parselzx_history.setQueryString(null);
+  parselzx_history.setQueryString(obj);
+  if(context != null){
+    parselzx_history_response = new LzDelegate(context, funcname);
+  }else{
+    parselzx_history_response = false;
+  }
+  parselzx_history.doRequest();
+  ZloData_loadingflag.setOpacity(1);
+  ZloData_loadingflag.animate('height', 20, 0, false);
+}
+var parselzx_clear_response = false;
+function parselzx_clear_send(obj, context, funcname){
+  parselzx_clear.setQueryString(null);
+  parselzx_clear.setQueryString(obj);
+  if(context != null){
+    parselzx_clear_response = new LzDelegate(context, funcname);
+  }else{
+    parselzx_clear_response = false;
+  }
+  parselzx_clear.doRequest();
+  ZloData_loadingflag.setOpacity(1);
+  ZloData_loadingflag.animate('height', 20, 0, false);
+}
+var ZloUI_lastModalShown = false;
+var ZloUI_lastModalIconShown = false;
+var ZloUI_lastx = 0;
+var ZloUI_lasty = 0;
+function changeVirtual(destx, desty){
+  if(ZloUI_lastx == destx){
+    if(ZloUI_lasty == desty){return false;}
+  }
+  ZloUI_master.animate('x', (ZloUI_lastx-destx)*canvas.width, 500, true);
+  ZloUI_master.animate('y', (ZloUI_lasty-desty)*canvas.height, 500, true);
+  ZloUI_lastx = destx;
+  ZloUI_lasty = desty;
+}
+var ZloUI_NoTint = new Object;
+ZloUI_NoTint.rb = '0';
+ZloUI_NoTint.gb = '0';
+ZloUI_NoTint.bb = '0';
+var ZloUI_ActiveWinTint = new Object;
+ZloUI_ActiveWinTint.rb = '0';
+ZloUI_ActiveWinTint.gb = '0';
+ZloUI_ActiveWinTint.bb = '30';
+var ZloUI_ActiveSysTrayTint = new Object;
+ZloUI_ActiveSysTrayTint.rb = '50';
+ZloUI_ActiveSysTrayTint.gb = '0';
+ZloUI_ActiveSysTrayTint.bb = '0';
+var ZloUI_TaskBarTint = new Object;
+ZloUI_TaskBarTint.rb = '15';
+ZloUI_TaskBarTint.gb = '15';
+ZloUI_TaskBarTint.bb = '18';
+var ZloUI_TaskBarDownTint = new Object;
+ZloUI_TaskBarDownTint.rb = '-30';
+ZloUI_TaskBarDownTint.gb = '-30';
+ZloUI_TaskBarDownTint.bb = '-30';
+var ZloUI_vmviewstate = false;
+var ZloACL_listusers_response = false;
+function ZloACL_listusers_send(obj, context, funcname){
+  ZloACL_listusers.setQueryString(null);
+  ZloACL_listusers.setQueryString(obj);
+  if(context != null){
+    ZloACL_listusers_response = new LzDelegate(context, funcname);
+  }else{
+    ZloACL_listusers_response = false;
+  }
+  ZloACL_listusers.doRequest();
+  ZloData_loadingflag.setOpacity(1);
+  ZloData_loadingflag.animate('height', 20, 0, false);
+}
+</script><dataset name="ZloData_securityset" request="true" src="http://index/xc/ZloData/security" type="http"><handler name="ondata">ZloData_loadingflag.animate('opacity', 0.00, 700, false);
+if(ZloData_securityset_response != false){
+  ZloData_securityset_response.execute();
+}</handler></dataset><class initstage="early" name="ZloBase_waypoint"><attribute name="at" type="string"/><attribute name="named" type="string"/><method args="p,a" name="construct">//NOTE &quot;this node&quot; means the parent of this tag
+var at = a['at'];
+var named = a['named']
+var np = at ? eval(at) : p.immediateparent;
+//find out which node will receive the new waypoint
+while(1){
+    //have we found a potential parent waypoint or have an &quot;at&quot; operation?
+    if(at || np['parentwaypoint'] || np['id'] || np.nodeLevel == 0){
+        //initialize space to hold waypoints if this is new.
+        if(np['_'] == undefined) np._ = {};
+        //if no name given make a name based on the number of other nameless waypoints
+        //otherwise ensure the name doesn't overwrite anything in the target waypoint space.
+        if(!named){
+            // if __waypointCount is not defined initialize it to zero, otherwise increment
+            np.__waypointcount = np['__waypointcount'] != undefined ? np.__waypointcount + 1 : 0;
+            // and use value that to generate a unique name
+            named = &quot;__waypoint&quot;+np.__waypointcount;
+        }else if(np._[named] != undefined){
+            Debug.warn('waypoint overwritten:', np, 'name', named);
+        }
+        //Add this node to a waypoint, add the waypoint to this node, then break
+        np._[named] = p;
+        p.parentwaypoint = np;
+        break;
+    }
+    //or just keep looking up the tree until we find a good target.
+    np = np.immediateparent;
+}
+//we don't need the tag anymore, it's done it's job (cyclic GC? investigate)
+super.construct();</method></class><resource name="ZloWidgets_closebubble" src="icons/closebubble.png"/><resource name="makeImageStretchBorderClass_5_fatTL" src="shadow/tl.png"/><resource name="makeImageStretchBorderClass_5_fatTR" src="shadow/tr.png"/><resource name="makeImageStretchBorderClass_5_fatBL" src="shadow/bl.png"/><resource name="makeImageStretchBorderClass_5_fatBR" src="shadow/br.png"/><resource name="makeImageStretchBorderClass_5_fatT" src="shadow/t.png"/><resource name="makeImageStretchBorderClass_5_fatL" src="shadow/l.png"/><resource name="makeImageStretchBorderClass_5_fatB" src="shadow/b.png"/><resource name="makeImageStretchBorderClass_5_fatR" src="shadow/r.png"/><class extends="view" name="ZloWidgets_shadow"><view clip="true"><view height="${classroot.height-(10*2)}" resource="makeImageStretchBorderClass_5_fatL" stretches="height" x="0" y="10"/><view height="${classroot.height-(10*2)}" resource="makeImageStretchBorderClass_5_fatR" stretches="height" x="${classroot.width-10}" y="10"/><view resource="makeImageStretchBorderClass_5_fatT" stretches="width" width="${classroot.width-(10*2)}" x="10" y="0"/><view resource="makeImageStretchBorderClass_5_fatB" stretches="width" width="${classroot.width-(10*2)}" x="10" y="${classroot.height-10}"/><view height="10" resource="makeImageStretchBorderClass_5_fatTL" stretches="both" width="10" x="0" y="0"/><view height="10" resource="makeImageStretchBorderClass_5_fatTR" stretches="both" width="10" x="${classroot.width-10}" y="0"/><view height="10" resource="makeImageStretchBorderClass_5_fatBL" stretches="both" width="10" x="0" y="${classroot.height-10}"/><view height="10" resource="makeImageStretchBorderClass_5_fatBR" stretches="both" width="10" x="${classroot.width-10}" y="${classroot.height-10}"/><view bgcolor="black" clip="true" height="${classroot.height-(10*2)}" width="${classroot.width-(10*2)}" x="10" y="10"/></view></class><resource name="ZloWidgets_dropdownUp" src="aqua/dropdown.png"/><resource name="ZloWidgets_dropdownOver" src="aqua/dropdownOver.png"/><class extends="view" height="25" name="ZloWidgets_aquaDropdown" width="247"><attribute name="value" type="string"/>
+<attribute name="path" type="string"/>
+<attribute name="initial" type="string"/>
+<attribute name="elem" type="string"/><view name="dropdown"><view resource="ZloWidgets_dropdownUp"/><view name="over" opacity="0.2" resource="ZloWidgets_dropdownOver"/></view><view height="${parent.height}" name="selected" width="${parent.width}"><text name="textfield" resize="true" text="${classroot.initial}" width="${parent.width}" x="8" y="2"/><handler name="onclick">classroot.dropsheet.animate('height', 150, 150, false, {motion: 'easeout'});
+classroot.dropsheet.animate('opacity', 1, 300, false, {motion: 'easeout'});</handler><handler name="onmouseover">classroot.dropdown.over.animate('opacity', 1, 300, false);</handler><handler name="onmouseout">classroot.dropdown.over.animate('opacity', 0.01, 300, false);</handler></view><view bgcolor="0xf0f0ff" clip="true" height="0" name="dropsheet" opacity="0" width="${parent.width-25}" x="3" y="2"><scrollbar axis="y" disabledbgcolor="0xbbbbbb"/><view><simplelayout axis="y" spacing="0"/><view datapath="${classroot.path}" width="${classroot.dropsheet.width-13}"><view bgcolor="0x0000ff" height="${parent.height}" opacity="0.01" width="${parent.width}"><handler name="onmouseover">this.setAttribute('bgcolor', '0x0000ff');
+this.animate('opacity', 0.4, 200, false, {motion:'easeout'});</handler><handler name="onmouseout">this.animate('opacity', 0.01, 200, false, {motion:'easeout'});</handler><handler name="onclick">classroot.dropdown.over.animate('opacity', 0.2, 150, false);
+classroot.dropsheet.animate('height', 0, 150, false, {motion: 'easein'});
+classroot.dropsheet.animate('opacity', 0, 150, false, {motion: 'easein'});
+classroot.selected.textfield.setText(parent.item.field.getText());
+classroot.setAttribute('value', parent.item.field.getText());
+classroot.doAfter();</handler></view><view name="item" width="${parent.width}"><text name="field" resize="true" text="$path{classroot.elem}"/></view></view></view></view></class><resource name="makeImageBorderClass_2_fatTL" src="fuzzbox/fat_tl.png"/><resource name="makeImageBorderClass_2_fatTR" src="fuzzbox/fat_tr.png"/><resource name="makeImageBorderClass_2_fatBL" src="fuzzbox/fat_bl.png"/><resource name="makeImageBorderClass_2_fatBR" src="fuzzbox/fat_br.png"/><resource name="makeImageBorderClass_2_fatT" src="fuzzbox/fat_t.png"/><resource name="makeImageBorderClass_2_fatL" src="fuzzbox/fat_l.png"/><resource name="makeImageBorderClass_2_fatB" src="fuzzbox/fat_b.png"/><resource name="makeImageBorderClass_2_fatR" src="fuzzbox/fat_r.png"/><class extends="view" name="ZloWidgets_fuzzbox"><view clip="true"><view clip="true" height="${classroot.height-(35*2)}" resource="makeImageBorderClass_2_fatL" x="0" y="35"/><view clip="true" height="${classroot.height-(35*2)}" resource="makeImageBorderClass_2_fatR" x="${classroot.width-35}" y="35"/><view clip="true" resource="makeImageBorderClass_2_fatT" width="${classroot.width-(35*2)}" x="35" y="0"/><view clip="true" resource="makeImageBorderClass_2_fatB" width="${classroot.width-(35*2)}" x="35" y="${classroot.height-35}"/><view clip="true" resource="makeImageBorderClass_2_fatTL" x="0" y="0"/><view clip="true" resource="makeImageBorderClass_2_fatTR" x="${classroot.width-35}" y="0"/><view clip="true" resource="makeImageBorderClass_2_fatBL" x="0" y="${classroot.height-35}"/><view clip="true" resource="makeImageBorderClass_2_fatBR" x="${classroot.width-35}" y="${classroot.height-35}"/><view bgcolor="white" clip="true" height="${classroot.height-(35*2)}" width="${classroot.width-(35*2)}" x="35" y="35"/></view></class><resource name="makeStretchBorderClass_2_tl" src="roundlabel/tl.png"/><resource name="makeStretchBorderClass_2_tr" src="roundlabel/tr.png"/><resource name="makeStretchBorderClass_2_bl" src="roundlabel/bl.png"/><resource name="makeStretchBorderClass_2_br" src="roundlabel/br.png"/><resource name="makeStretchBorderClass_2_c" src="roundlabel/c.png"/><class extends="view" name="ZloWidgets_roundbox"><view resource="makeStretchBorderClass_2_tl" x="0" y="0"/><view resource="makeStretchBorderClass_2_tr" x="${classroot.width-10}" y="0"/><view resource="makeStretchBorderClass_2_bl" x="0" y="${classroot.height-10}"/><view resource="makeStretchBorderClass_2_br" x="${classroot.width-10}" y="${classroot.height-10}"/><view clip="true"><view height="10" resource="makeStretchBorderClass_2_c" stretches="both" width="${classroot.width-(10*2)}" x="10" y="0"/></view><view clip="true"><view height="${classroot.height-(10*2)}" resource="makeStretchBorderClass_2_c" stretches="both" width="10" x="${classroot.width-10}" y="10"/></view><view clip="true"><view height="10" resource="makeStretchBorderClass_2_c" stretches="both" width="${classroot.width-(10*2)}" x="10" y="${classroot.height-10}"/></view><view clip="true"><view height="${classroot.height-(10*2)}" resource="makeStretchBorderClass_2_c" stretches="both" width="10" x="0" y="10"/></view><view clip="true"><view height="${classroot.height-(10*2)}" resource="makeStretchBorderClass_2_c" stretches="both" width="${classroot.width-(10*2)}" x="10" y="10"/></view></class><resource name="makeStretchButtonClass_6_l" src="glass/button/big/l.png"/><resource name="makeStretchButtonClass_6_c" src="glass/button/big/c.png"/><resource name="makeStretchButtonClass_6_r" src="glass/button/big/r.png"/><resource name="makeStretchButtonClass_6_hl" src="glass/button/big/hl.png"/><resource name="makeStretchButtonClass_6_hc" src="glass/button/big/hc.png"/><resource name="makeStretchButtonClass_6_hr" src="glass/button/big/hr.png"/><class name="ZloWidgets_bigGlassButton" width="${this.field.getTextWidth()+20}"><attribute name="label" type="string" value="No Label"/><view name="up" valign="middle"><view name="center" resource="makeStretchButtonClass_6_c" stretches="width" width="${classroot.width-(14*2)}" x="14" y="0"/><view resource="makeStretchButtonClass_6_l"/><view resource="makeStretchButtonClass_6_r" x="${classroot.width-14}" y="0"/></view><view name="over" opacity="0" valign="middle"><view resource="makeStretchButtonClass_6_hc" stretches="width" width="${classroot.width-(14*2)}" x="14" y="0"/><view resource="makeStretchButtonClass_6_hl"/><view resource="makeStretchButtonClass_6_hr" x="${classroot.width-14}" y="0"/></view><text align="center" fgcolor="white" name="field" resize="true" text="${classroot.label}" valign="middle"/><method event="onmouseout">over.animate('opacity', 0, 600, false);</method><method event="onmouseover">over.animate('opacity', 0.7, 200, false);</method></class><resource name="makeStretchButtonClass_7_l" src="glass/button/small/l.png"/><resource name="makeStretchButtonClass_7_c" src="glass/button/small/c.png"/><resource name="makeStretchButtonClass_7_r" src="glass/button/small/r.png"/><resource name="makeStretchButtonClass_7_hl" src="glass/button/small/hl.png"/><resource name="makeStretchButtonClass_7_hc" src="glass/button/small/hc.png"/><resource name="makeStretchButtonClass_7_hr" src="glass/button/small/hr.png"/><class name="ZloWidgets_smallGlassButton" width="${this.field.getTextWidth()+20}"><attribute name="label" type="string" value="No Label"/><view name="up" valign="middle"><view name="center" resource="makeStretchButtonClass_7_c" stretches="width" width="${classroot.width-(11*2)}" x="11" y="0"/><view resource="makeStretchButtonClass_7_l"/><view resource="makeStretchButtonClass_7_r" x="${classroot.width-11}" y="0"/></view><view name="over" opacity="0" valign="middle"><view resource="makeStretchButtonClass_7_hc" stretches="width" width="${classroot.width-(11*2)}" x="11" y="0"/><view resource="makeStretchButtonClass_7_hl"/><view resource="makeStretchButtonClass_7_hr" x="${classroot.width-11}" y="0"/></view><text align="center" fgcolor="white" name="field" resize="true" text="${classroot.label}" valign="middle"/><method event="onmouseout">over.animate('opacity', 0, 600, false);</method><method event="onmouseover">over.animate('opacity', 0.7, 200, false);</method></class><resource name="makeStretchButtonClass_8_l" src="aqua/smallBevel/l.png"/><resource name="makeStretchButtonClass_8_c" src="aqua/smallBevel/c.png"/><resource name="makeStretchButtonClass_8_r" src="aqua/smallBevel/r.png"/><resource name="makeStretchButtonClass_8_hl" src="aqua/smallBevel/hl.png"/><resource name="makeStretchButtonClass_8_hc" src="aqua/smallBevel/hc.png"/><resource name="makeStretchButtonClass_8_hr" src="aqua/smallBevel/hr.png"/><class name="ZloWidgets_smallBarButton" width="${this.field.getTextWidth()+20}"><attribute name="label" type="string" value="No Label"/><view name="up" valign="middle"><view name="center" resource="makeStretchButtonClass_8_c" stretches="width" width="${classroot.width-(5*2)}" x="5" y="0"/><view resource="makeStretchButtonClass_8_l"/><view resource="makeStretchButtonClass_8_r" x="${classroot.width-5}" y="0"/></view><view name="over" opacity="0" valign="middle"><view resource="makeStretchButtonClass_8_hc" stretches="width" width="${classroot.width-(5*2)}" x="5" y="0"/><view resource="makeStretchButtonClass_8_hl"/><view resource="makeStretchButtonClass_8_hr" x="${classroot.width-5}" y="0"/></view><text align="center" fgcolor="black" name="field" resize="true" text="${classroot.label}" valign="middle"/><method event="onmouseout">over.animate('opacity', 0, 600, false);</method><method event="onmouseover">over.animate('opacity', 0.7, 200, false);</method></class><resource name="makeStaticImageClass_2_up" src="glass/button/pill/p.png"/><resource name="makeStaticImageClass_2_over" src="glass/button/pill/hp.png"/><class extends="view" name="ZloWidgets_pillbox"><view resource="makeStaticImageClass_2_up"/><view name="over" opacity="0" resource="makeStaticImageClass_2_over"/><method event="onmouseout">over.animate('opacity', 0, 600, false);</method><method event="onmouseover">over.animate('opacity', 0.7, 200, false);</method></class><resource name="makeDisclosureTriangleClass_2_triangleup" src="icons/1rightarrow.png"/><resource name="makeDisclosureTriangleClass_2_triangledown" src="icons/1downarrow.png"/><class align="center" extends="view" height="10" name="ZloWidgets_disclosureTriangle" stretches="both" valign="middle" width="10"><view name="triangleup" resource="makeDisclosureTriangleClass_2_triangleup"/><view name="triangledown" resource="makeDisclosureTriangleClass_2_triangledown" visible="false"/><handler name="oninit">this.state = false;</handler><handler name="onclick">this.triangleup.setVisible(this.state);
+this.triangledown.setVisible(!this.state);
+this.state = !this.state;</handler></class><class clip="true" extends="view" height="${this.label.field.getTextHeight()}" name="ZloWidgets_infoAccordian"><attribute name="title" type="string" value="No Title"/>
+<attribute name="body" type="string" value="No Body"/>
+<attribute name="highlightcolor" type="string" value="0x2c81a8"/>
+<attribute name="labelcolor" type="string" value="0xf7f310"/><attribute name="labelfont" type="string" value="ZloUI_axelrod"/>
+<attribute name="bodyfont" type="string" value="ZloUI_communicate"/>
+<attribute name="bodycolor" type="string" value="0xf7f310"/><attribute name="labelsize" type="number" value="24"/>
+<attribute name="bodysize" type="number" value="12"/><simplelayout axis="y" spacing="0"/><handler name="onclick">var bodyH = this.content.field.getTextHeight();
+var labelH = this.label.field.getTextHeight();
+this.animate('height', labelH+bodyH, 300, false);
+this.content.setVisible(true);</handler><handler name="onmouseover">this.label.backing.animate('opacity', 0.4, 300, false);</handler><handler name="onmouseout">this.label.backing.animate('opacity', 0.001, 300, false);</handler><view name="label" width="${classroot.width}"><ZloWidgets_roundbox fgcolor="${classroot.labelcolor}" height="${parent.field.getTextHeight()}" name="backing" opacity="0.001" width="${parent.width}"/><text font="${classroot.labelfont}" fontsize="24" name="field" resize="true" text="${classroot.title}" valign="middle"/></view><view name="content" visible="false" width="${classroot.width}"><ZloWidgets_roundbox fgcolor="${classroot.bodycolor}" height="${parent.height}" opacity="0.2" width="${parent.width}"><handler name="onclick">var labelH = classroot.label.field.getTextHeight();
+classroot.animate('height', labelH, 300, false);
+parent.setVisible(false);</handler></ZloWidgets_roundbox><text fgcolor="black" font="${classroot.bodyfont}" fontsize="13" multiline="true" name="field" resize="true" text="${classroot.body}" width="${parent.width}"/></view></class><class extends="view" height="${field.getHeight()*1.5}" name="ZloWidgets_roundedText"><attribute name="label" type="string"/>
+<attribute name="color" type="string" value="black"/><method event="onmouseover">this.box.animate('opacity', 0.8, 150, false);</method><method event="onmouseout">this.box.animate('opacity', 0.2, 300, false, {motion:'easein'});</method><ZloWidgets_roundbox fgcolor="${classroot.color}" height="${parent.height}" name="box" opacity="0.2" width="${parent.width}"/><text align="center" fgcolor="white" name="field" resize="true" text="${classroot.getAttribute('label')}" valign="middle"/></class><dataset name="parselzx_history" request="true" src="/xc/parselzx/history" type="http"><handler name="ondata">ZloData_loadingflag.animate('opacity', 0.00, 700, false);
+if(parselzx_history_response != false){
+  parselzx_history_response.execute();
+}</handler></dataset><dataset name="parselzx_clear" src="/xc/parselzx/clear" type="http"><handler name="ondata">ZloData_loadingflag.animate('opacity', 0.00, 700, false);
+if(parselzx_clear_response != false){
+  parselzx_clear_response.execute();
+}</handler></dataset><class name="parselzx_onepage"><attribute name="path" type="string"/><attribute name="fromhistory" type="string"/></class><dataset name="parsedfile" ondata="ZloData_loadingflag.animate('opacity', 0.00, 700, false);parselzx_history_send(null, null);" request="true" src="/xc/parselzx/parsetree" type="http"/>
+<method args="obj" name="parsedfile_send">parsedfile.setQueryString(null);
+parsedfile.setQueryString(obj);
+parsedfile.doRequest();
+ZloData_loadingflag.setOpacity(1);
+ZloData_loadingflag.animate('height', 20, 0, false);</method><handler name="oninit">var obj = new Object;
+obj.path = this.getAttribute('path');
+obj.fromhistory = this.getAttribute('fromhistory');
+this.parsedfile.setQueryString(obj);
+this.parsedfile.doRequest();
+ZloData_loadingflag.setOpacity(1);
+ZloData_loadingflag.animate('opacity', 0.00, 700, false);</handler><view><simplelayout axis="y" spacing="0"/><view clip="true" datapath="local:classroot.parsedfile:/set/entry"><ZloBase_waypoint/><view bgcolor="0x0000ff" height="${parent.height}" opacity="0.01" width="${parent.width}"><handler name="onmouseover">this.setAttribute('bgcolor', '0x0000ff');
+this.animate('opacity', 0.4, 200, false, {motion:'easeout'});</handler><handler name="onmouseout">this.animate('opacity', 0.01, 200, false, {motion:'easeout'});</handler><handler name="oninit">this.opened = false;</handler><handler name="onclick">if(!this.opened){
+  parent._.info.animate('height', parent._.info.height, 200, true);
+  parent._.info.animate('height', parent._.info.height, 200, true);
+}else{
+  parent.animate('height', -parent._.info.height, 200, true);
+}
+this.opened = !this.opened</handler></view><view x="$path{'@indent'}"><simplelayout axis="y" spacing="0"/><view><simplelayout axis="x" spacing="0"/><text resize="true" text="$path{'@type'}"/><text bgcolor="0xccccde" resize="true" selectable="true" text="$path{'@names'}"/></view><view height="0"><text bgcolor="0xe4e4e4" multiline="true" resize="true" selectable="true" text="$path{'text()'}" width="${classroot.width}"><ZloBase_waypoint named="info"/></text></view></view></view></view><scrollbar axis="y" disabledbgcolor="0xbbbbbb"/><font name="ZloUI_axelrod" src="fonts/AXLEROD3.TTF"/><font name="ZloUI_badtimes" src="fonts/BADTIME1.TTF"/><font name="ZloUI_foursticks" src="fonts/4STICK10.TTF"/><font name="ZloUI_communicate" src="fonts/COMMUN38.TTF"/><font name="ZloUI_blackdog" src="fonts/BLKDOG15.TTF"/><resource name="ZloUI_Background" src="backgrounds/graphite.jpg"/><resource name="ZloUI_GlassBar" src="aqua/aquabar1.jpg"/><resource name="ZloUI_GlassBarL" src="aqua/aquabar1_leftcap.png"/><resource name="ZloUI_GlassBarR" src="aqua/aquabar1_rightcap.png"/><resource name="ZloUI_menubck1" src="osxwin/menus/menu1/background.png"/><resource name="ZloUI_winbacking" src="osxwin/newstyle/backing.png"/><resource name="ZloUI_VMIcon" src="icons/tv.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatTL" src="osxwin/newstyle/tl.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatTR" src="osxwin/newstyle/tr.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatBL" src="osxwin/newstyle/bl.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatBR" src="osxwin/newstyle/br.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatT" src="osxwin/newstyle/t.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatL" src="osxwin/newstyle/l.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatB" src="osxwin/newstyle/b.png"/><resource name="makeImageStretchBorderResizeableClass_2_fatR" src="osxwin/newstyle/r.png"/><class extends="view" name="ZloUI_osxwin"><attribute name="rootid" type="string"/><view height="${classroot.height-(14*2)}" resource="makeImageStretchBorderResizeableClass_2_fatL" stretches="height" x="0" y="14"/><view height="${classroot.height-(14*2)}" resource="makeImageStretchBorderResizeableClass_2_fatR" stretches="height" x="${classroot.width-14}" y="14"/><view resource="makeImageStretchBorderResizeableClass_2_fatT" stretches="width" width="${classroot.width-(14*2)}" x="14" y="0"/><view resource="makeImageStretchBorderResizeableClass_2_fatB" stretches="width" width="${classroot.width-(14*2)}" x="14" y="${classroot.height-14}"/><view height="14" resource="makeImageStretchBorderResizeableClass_2_fatTL" stretches="both" width="14" x="0" y="0"/><view height="14" resource="makeImageStretchBorderResizeableClass_2_fatTR" stretches="both" width="14" x="${classroot.width-14}" y="0"/><view height="14" resource="makeImageStretchBorderResizeableClass_2_fatBL" stretches="both" width="14" x="0" y="${classroot.height-14}"/><view height="14*2" onmousedown="var obj = eval(classroot.getAttribute('rootid'));obj.bringToFront();obj.resizer.apply();" onmouseout="highlight.animate('opacity', 0, 600, false);" onmouseover="highlight.animate('opacity', 0.7, 200, false);" onmouseup="var obj = eval(classroot.getAttribute('rootid'));obj.resizer.remove();obj.datapath.updateData();" resource="makeImageStretchBorderResizeableClass_2_fatBR" width="14*2" x="${classroot.width-14}" y="${classroot.height-14}"><ZloWidgets_roundbox fgcolor="0xb2b6e7" height="${parent.height}" name="highlight" opacity="0" width="${parent.width}"/></view><view bgcolor="0xD6D6DD" clip="true" height="${classroot.height-(14*2)}" width="${classroot.width-(14*2)}" x="14" y="14"/></class><resource name="makeImageStretchBorderClass_4_fatTL" src="osxwin/inner/tl.png"/><resource name="makeImageStretchBorderClass_4_fatTR" src="osxwin/inner/tr.png"/><resource name="makeImageStretchBorderClass_4_fatBL" src="osxwin/inner/bl.png"/><resource name="makeImageStretchBorderClass_4_fatBR" src="osxwin/inner/br.png"/><resource name="makeImageStretchBorderClass_4_fatT" src="osxwin/inner/t.png"/><resource name="makeImageStretchBorderClass_4_fatL" src="osxwin/inner/l.png"/><resource name="makeImageStretchBorderClass_4_fatB" src="osxwin/inner/b.png"/><resource name="makeImageStretchBorderClass_4_fatR" src="osxwin/inner/r.png"/><class extends="view" name="ZloUI_osxwininner"><view clip="true"><view height="${classroot.height-(11*2)}" resource="makeImageStretchBorderClass_4_fatL" stretches="height" x="0" y="11"/><view height="${classroot.height-(11*2)}" resource="makeImageStretchBorderClass_4_fatR" stretches="height" x="${classroot.width-11}" y="11"/><view resource="makeImageStretchBorderClass_4_fatT" stretches="width" width="${classroot.width-(11*2)}" x="11" y="0"/><view resource="makeImageStretchBorderClass_4_fatB" stretches="width" width="${classroot.width-(11*2)}" x="11" y="${classroot.height-11}"/><view height="11" resource="makeImageStretchBorderClass_4_fatTL" stretches="both" width="11" x="0" y="0"/><view height="11" resource="makeImageStretchBorderClass_4_fatTR" stretches="both" width="11" x="${classroot.width-11}" y="0"/><view height="11" resource="makeImageStretchBorderClass_4_fatBL" stretches="both" width="11" x="0" y="${classroot.height-11}"/><view height="11" resource="makeImageStretchBorderClass_4_fatBR" stretches="both" width="11" x="${classroot.width-11}" y="${classroot.height-11}"/><view bgcolor="0xD6D6DD" clip="true" height="${classroot.height-(11*2)}" width="${classroot.width-(11*2)}" x="11" y="11"/></view></class><class name="ZloUI_window" opacity="0"><attribute name="title" type="string"/><attribute name="contentid" type="string"/><attribute name="minimized" type="string"/><attribute name="security" type="string"/><attribute name="sheets" type="expression"/><resizestate name="resizer"/><dragstate name="dragger"/><handler name="onx">this.datapath.setNodeAttribute('x', this.x);</handler><handler name="ony">this.datapath.setNodeAttribute('y', this.y);</handler><handler name="onwidth">this.datapath.setNodeAttribute('width', this.width);</handler><handler name="onheight">this.datapath.setNodeAttribute('height', this.height);</handler><handler name="onminimized">if(this.getAttribute('minimized') == 'true'){
+  this.shadow.animate('opacity', 0, 25, false);
+  this.animate('opacity', 0, 250, false);
+}else{
+  this.shadow.animate('opacity', 0.15, 250, false);
+  this.animate('opacity', 1, 250, false);
+}</handler><method args="num" name="sheet">var i = 0;
+Debug.write('this.sheets');
+for(var id in this.sheets){
+  eval(id).animate('x', 20, 700, false);
+}</method><method args="force" name="minimize">if(this.getAttribute('minimized') != 'true' || force == true){
+  this.datapath.setNodeAttribute('minimized', 'true');
+}
+else{
+  this.datapath.setNodeAttribute('minimized', 'false');
+}</method><method name="windown">return true;
+this.window.animate('x', 3, 250, true);
+this.window.animate('y', 3, 250, true);
+this.shadow.animate('x', -5, 250, true);
+this.shadow.animate('y', -5, 250, true);
+this.shadow.animate('opacity', 0.2, 250, true);
+content = eval(this.getAttribute('contentid'));
+content.animate('x', 3, 250, true);
+content.animate('y', 3, 250, true);</method><method name="winup">return true;
+this.window.animate('x', -3, 250, true);
+this.window.animate('y', -3, 250, true);
+this.shadow.animate('x', 5, 250, true);
+this.shadow.animate('y', 5, 250, true);
+this.shadow.animate('opacity', -0.2, 250, true);
+content = eval(this.getAttribute('contentid'));
+content.animate('x', -3, 250, true);
+content.animate('y', -3, 250, true);</method><ZloWidgets_shadow fgcolor="0x222222" height="${parseInt(classroot.height)+9}" name="shadow" opacity="0.15" width="${parseInt(classroot.width)+9}"/><view height="${parent.height}" name="window" width="${parent.width}"><ZloUI_osxwin fontsize="16" height="${parent.height}" onmousedown="classroot.parent.bringToFront();classroot.dragger.apply();classroot.winup();" onmouseup="classroot.dragger.remove();classroot.datapath.updateData();classroot.windown();" rootid="${classroot.getAttribute('id')}" width="${parent.width}"><ZloWidgets_pillbox name="pillbox" onclick="classroot.minimize();" x="${parent.width-parent.pillbox.width-4}" y="4"/><text font="ZloUI_communicate" fontsize="12" name="titlebar" resize="true" text="${classroot.datapath.getNodeAttribute('title')}" x="16" y="1"/></ZloUI_osxwin><ZloUI_osxwininner height="${parent.height-19}" width="${parent.width-6}" x="3" y="16"/><view height="${parent.height-36}" resource="ZloUI_winbacking" stretches="both" width="${parent.width-20}" x="10" y="23"/></view></class><class height="${parent.height}" name="ZloUI_modal" width="${parent.width}"><attribute name="title" type="string"/><attribute name="contentid" type="string"/><ZloWidgets_roundbox height="${parent.height}" opacity="0.92" width="${parent.width}"/><view fontsize="18" x="25" y="15"><ZloWidgets_roundbox fgcolor="0xddddff" height="${parent.label.height+10}" opacity="0.7" width="${parent.label.width+20}"/><view align="center" name="label" valign="middle"><text fgcolor="white" name="field" resize="true" text="${classroot.title}"/></view></view></class><class name="ZloUI_SysTrayIcon" onclick="if(this.action != 'false'){eval(this.action).action();return true;}var obj = eval(this.datapath.getNodeAttribute('id'));if(obj.opacity != 0){this.modalShown = false;this.setColorTransform(ZloUI_NoTint);obj.setOpacity(0);}else{if(ZloUI_lastModalShown){ZloUI_lastModalShown.setOpacity(0);ZloUI_lastModalIconShown.setColorTransform(ZloUI_NoTint);}obj.setOpacity(0.92);this.setColorTransform(ZloUI_ActiveSysTrayTint);ZloUI_lastModalShown = obj;ZloUI_lastModalIconShown = this;}" visible="${eval(this.datapath.getNodeAttribute('id')).parent.visible}"><attribute name="action" type="string" value="false"/></class><class bgcolor="0x111155" height="${eval(this.getAttribute('obj')).height/canvas.height*parent.height}" name="ZloUI_vmwindow" onmousedown="if(eval(this.getAttribute('obj')).opacity != 0){this.bringToFront();eval(this.getAttribute('obj')).parent.bringToFront();dragger.apply();eval(this.getAttribute('obj')).winup();}" onmouseout="if(eval(this.getAttribute('obj')).opacity != 0){this.label.animate('opacity', 0, 250, false);this.animate('opacity', eval(this.getAttribute('obj')).opacity/2, 200, false);this.setBGColor('0x111155');eval(this.getAttribute('obj')).setColorTransform(ZloUI_NoTint);}" onmouseover="if(eval(this.getAttribute('obj')).opacity != 0){this.animate('opacity', 0.9, 200, false);this.setBGColor('0x1111ff');this.label.animate('opacity', 1, 250, false);eval(this.getAttribute('obj')).setColorTransform(ZloUI_ActiveWinTint);}" onmouseup="if(eval(this.getAttribute('obj')).opacity != 0){dragger.remove();eval(this.getAttribute('obj')).windown();}" opacity="${eval(this.getAttribute('obj')).opacity/2}" visible="${eval(this.getAttribute('obj')).parent.visible}" width="${eval(this.getAttribute('obj')).width/canvas.width*parent.width}" x="${parent.width/canvas.width*eval(this.getAttribute('obj')).x}" y="${parent.height/canvas.height*eval(this.getAttribute('obj')).y}"><attribute name="obj" type="expression"/><dragstate drag_max_x="${(parent.width*2)-this.width}" drag_max_y="${(parent.height*2)-this.height}" drag_min_x="0" drag_min_y="0" name="dragger"/><handler name="onx">eval(this.getAttribute('obj')).setX((canvas.width/parent.width)*this.x);</handler><handler name="ony">eval(this.getAttribute('obj')).setY((canvas.height/parent.height)*this.y);</handler><view align="center" name="label" opacity="0" valign="middle"><ZloWidgets_roundbox fgcolor="0x000000" height="${parent.field.height+8}" opacity="0.4" width="${parent.field.width+10}"/><text align="center" fgcolor="0xffffff" fontsize="10" name="field" resize="true" text="${eval(classroot.getAttribute('obj')).title}" valign="middle"/></view></class><class name="ZloUI_virtualmonitors"><view clip="true" height="${classroot.height*2}" width="${classroot.width*2}"><view height="${classroot.height}" width="${classroot.width}" x="0" y="0"><ZloWidgets_roundbox fgcolor="0x999999" height="${parent.height}" opacity="0.9" width="${parent.width}"/><ZloWidgets_roundbox fgcolor="0xee9c88" height="${parent.height}" onclick="changeVirtual(0, 0);" ondblclick="ZloUI_vmtoggle.setColorTransform(ZloUI_NoTint);ZloUI_vmdisplay.animate('y', -227, 500, true);ZloUI_vmdisplay.animate('opacity', 0, 500, false);ZloUI_vmviewstate = !ZloUI_vmviewstate;" opacity="0.01" width="${parent.width}"><method event="onmouseover">this.animate('opacity', 0.5, 400, false);</method><method event="onmouseout">this.animate('opacity', 0.01, 400, false);</method></ZloWidgets_roundbox></view><view height="${classroot.height}" width="${classroot.width}" x="${classroot.width}" y="0"><ZloWidgets_roundbox fgcolor="0x999999" height="${parent.height}" opacity="0.9" width="${parent.width}"/><ZloWidgets_roundbox fgcolor="0xee9c88" height="${parent.height}" onclick="changeVirtual(1, 0);" ondblclick="ZloUI_vmtoggle.setColorTransform(ZloUI_NoTint);ZloUI_vmdisplay.animate('y', -227, 500, true);ZloUI_vmdisplay.animate('opacity', 0, 500, false);ZloUI_vmviewstate = !ZloUI_vmviewstate;" opacity="0.01" width="${parent.width}"><method event="onmouseover">this.animate('opacity', 0.5, 400, false);</method><method event="onmouseout">this.animate('opacity', 0.01, 400, false);</method></ZloWidgets_roundbox></view><view height="${classroot.height}" width="${classroot.width}" x="0" y="${classroot.height}"><ZloWidgets_roundbox fgcolor="0x999999" height="${parent.height}" opacity="0.9" width="${parent.width}"/><ZloWidgets_roundbox fgcolor="0xee9c88" height="${parent.height}" onclick="changeVirtual(0, 1);" ondblclick="ZloUI_vmtoggle.setColorTransform(ZloUI_NoTint);ZloUI_vmdisplay.animate('y', -227, 500, true);ZloUI_vmdisplay.animate('opacity', 0, 500, false);ZloUI_vmviewstate = !ZloUI_vmviewstate;" opacity="0.01" width="${parent.width}"><method event="onmouseover">this.animate('opacity', 0.5, 400, false);</method><method event="onmouseout">this.animate('opacity', 0.01, 400, false);</method></ZloWidgets_roundbox></view><view height="${classroot.height}" width="${classroot.width}" x="${classroot.width}" y="${classroot.height}"><ZloWidgets_roundbox fgcolor="0x999999" height="${parent.height}" opacity="0.9" width="${parent.width}"/><ZloWidgets_roundbox fgcolor="0xee9c88" height="${parent.height}" onclick="changeVirtual(1, 1);" ondblclick="ZloUI_vmtoggle.setColorTransform(ZloUI_NoTint);ZloUI_vmdisplay.animate('y', -227, 500, true);ZloUI_vmdisplay.animate('opacity', 0, 500, false);ZloUI_vmviewstate = !ZloUI_vmviewstate;" opacity="0.01" width="${parent.width}"><method event="onmouseover">this.animate('opacity', 0.5, 400, false);</method><method event="onmouseout">this.animate('opacity', 0.01, 400, false);</method></ZloWidgets_roundbox></view><view height="${classroot.height}" width="${classroot.width}"><ZloUI_vmwindow datapath="ZloUI_TaskBarDataset:/window" obj="$path{'@id'}"/></view></view></class><class fontsize="13" name="ZloUI_StartBar" visible="${eval(this.datapath.getNodeAttribute('id')).parent.visible}"><attribute name="tint" type="string" value="false"/><handler name="onminimized">if(this.getAttribute('minimized') == 'true'){
+  this.setColorTransform(ZloUI_NoTint);
+}else{
+  this.setColorTransform(ZloUI_TaskBarDownTint);
+}</handler><ZloWidgets_smallBarButton label="$path{'@title'}" onclick="if(this['lastx'] == canvas.getMouse('x')){obj = eval(classroot.datapath.getNodeAttribute('id'));obj.parent.bringToFront();obj.minimize();if(classroot.datapath.getNodeName() == 'desktop'){var dp = canvas.datasets['ZloUI_GlobalSettings'].getPointer();dp.setXPath('activewindow');dp.setNodeAttribute('title', this.getAttribute('label'));dp.setNodeAttribute('id', classroot.datapath.getNodeAttribute('id'));}}" onmousedown="this.lastx = canvas.getMouse('x');ZloUI_activeWinDragger.apply();" onmouseout="if(classroot.getAttribute('tint') != 'false'){eval(classroot.datapath.getNodeAttribute('id')).setColorTransform(ZloUI_NoTint);}" onmouseover="if(classroot.getAttribute('tint') != 'false'){eval(classroot.datapath.getNodeAttribute('id')).setColorTransform(ZloUI_ActiveWinTint);}" onmouseup="ZloUI_activeWinDragger.remove();"/></class><resource name="ZloUI_loginpane" src="icons/login.png"/><class name="ZloUI_LoginPane"><ZloBase_waypoint/><method name="submitLoginInfo">var obj = new Object;
+obj.login = classroot._.user.getText();
+obj.password = classroot._.password.getText();
+ZloData_securityset_send(obj, this, &quot;response&quot;);</method><method name="response">var dp = canvas.datasets['ZloData_securityset'].getPointer();
+var username = dp.xpathQuery('/security/user/@name');
+if(username != 'anonymous'){
+  ZloUI_SystemMessage.display('Logged in as: ' + username);
+  classroot._.user.clearText();
+  classroot._.password.clearText();
+}else{
+  ZloUI_SystemMessage.display('You are not logged in.');
+  return false;
+}</method><ZloWidgets_shadow height="${classroot.pane.height}" opacity="0.6" width="${classroot.pane.width}" x="0" y="6"/><view name="pane" resource="ZloUI_loginpane"><view datapath="ZloData_securityset:/security/user[@name='anonymous']" doesenter="true" height="25" initstage="late" password="true" visible="$path{'@name'}" width="160" x="285" y="3"><edittext/><ZloBase_waypoint named="user"/><method name="doEnterDown">classroot.submitLoginInfo();</method><edittext/><ZloBase_waypoint named="password"/><method name="doEnterDown">classroot.submitLoginInfo();</method></view><view name="logout" valign="middle" visible="${!classroot._.login.visible}" x="${parent.width-this.width}"><view datapath="ZloData_securityset:/security/user"><simplelayout axis="x" spacing="0"/><text fgcolor="white" resize="true" text="Logged in as:"/><text fgcolor="red" resize="true" text="$path{'@name'}"/><ZloWidgets_smallGlassButton label="Logout" onclick="var obj = new Object;obj.login = '_LOGOUT';ZloData_securityset_send(obj, classroot, &quot;response&quot;);"/></view></view></view></class><class name="ZloUI_menu"><attribute name="label" type="string"/><text align="center" font="ZloUI_communicate" resize="true" text="${classroot.label}"/></class><resource name="ZloUI_sideTabMiddle" src="tabs/tab1middle.png"/><resource name="makeSideTabClass_2_top" src="tabs/tab1topchop.png"/><resource name="makeSideTabClass_2_middle" src="tabs/tab1middle.png"/><resource name="makeSideTabClass_2_bottom" src="tabs/tab1bottomchop.png"/><class name="ZloUI_sideTab"><attribute name="label" type="string" value="UnnamedTab"/><handler name="oninit">this.opened = false;</handler><view name="tab"><simplelayout axis="y" spacing="0"/><view resource="makeSideTabClass_2_top"/><view height="${classroot.title.field.getTextWidth()}" name="middle" resource="makeSideTabClass_2_middle" stretches="height"/><view resource="makeSideTabClass_2_bottom"/></view><view align="center" name="title" valign="middle"><text font="ZloUI_communicate" fontsize="14" name="field" resize="true" rotation="-90" text="${classroot.label}" y="${this.getWidth()}"/></view><handler name="onmouseover">this.parent.animate('opacity', 0.95, 600, false);</handler><handler name="onmouseout">if(!this.opened){
+  this.parent.animate('opacity', 0.5, 600, false);
+}</handler><handler name="onclick">this.minimize();</handler><method name="minimize">if(!this.opened){
+  var tid = this.getAttribute('id');
+  var dp = this.datapath.dupePointer();
+  dp.selectParent();
+  dp.selectChild();
+  do{
+    var currid = dp.getNodeAttribute('id');
+    if(currid != tid){
+      var obj = eval(currid).parent;
+      obj.animate('x', -this.tab.middle.resourcewidth, 600, false);
+      obj.animate('opacity', 0.5, 600, false);
+      obj.tab.opened = false;
+    }
+  }while(dp.selectNext());
+  this.parent.parent.bringToFront();
+  this.parent.animate('x', -this.parent.content.width, 600, true);
+  this.parent.animate('opacity', 0.95, 600, false);
+}else{
+  this.parent.animate('x', -this.tab.middle.resourcewidth, 600, false);
+}
+this.opened = !this.opened;</method></class><class name="ZloUI_DesktopShell"><handler name="onminimized">if(this.getAttribute('minimized') == 'true'){
+  this.setVisible(0);
+}else{
+  this.setVisible(1);
+}</handler><method args="force,toggleflag" name="minimize">if(this.getAttribute('minimized') == 'false' || force == true){
+  this.datapath.setNodeAttribute('minimized', 'true');
+}
+else{
+  this.datapath.setNodeAttribute('minimized', 'false');
+  var tid = this.datapath.getNodeAttribute('id');
+  var dp = this.datapath.dupePointer();
+  dp.selectParent();
+  dp.selectChild();
+  do{
+    var currid = dp.getNodeAttribute('id');
+    if(currid != tid &amp;&amp; dp.getNodeName() == 'desktop'){
+      eval(currid).minimize(true);
+    }
+  }while(dp.selectNext());
+}</method></class><class name="ZloUI_DesktopSwitcherIcons" visible="${eval(this.datapath.getNodeAttribute('id')).parent.visible}" width="${parent.width}"><attribute name="iconsize" type="number"/><handler name="onminimized">if(this.getAttribute('minimized') == 'true'){
+  this.setColorTransform(ZloUI_NoTint);
+}else{
+  this.setColorTransform(ZloUI_TaskBarDownTint);
+}</handler><view align="center" height="${classroot.iconsize}" name="icon" resource="$path{'@icon'}" stretches="both" valign="middle" width="${classroot.iconsize}"/><view align="center" height="${field.getTextHeight()+5}" name="label" opacity="0.01" valign="middle" width="${field.getTextWidth()+15}"><ZloWidgets_roundbox fgcolor="0x111144" height="${parent.height}" opacity="0.7" width="${parent.width}"><handler name="onclick">var obj = eval(classroot.datapath.getNodeAttribute('id'));
+obj.minimize();</handler><handler name="onmouseover">parent.animate('opacity', 0.8, 75, false);</handler><handler name="onmouseout">parent.animate('opacity', 0.01, 300, false);</handler></ZloWidgets_roundbox><text align="center" fgcolor="white" font="ZloUI_communicate" fontsize="16" name="field" resize="true" text="$path{'@title'}" valign="middle"/></view></class><class name="ZloUI_DesktopSwitcherText" visible="${eval(this.datapath.getNodeAttribute('id')).parent.visible}"><handler name="onminimized">if(this.getAttribute('minimized') == 'true'){
+  this.label.animate('opacity', 0.01, 500, false);
+  this.label.animate('width', 20, 500, false);
+}
+else{
+  this.label.animate('opacity', 0.8, 500, false);
+  this.label.animate('width', this.field.width+15, 500, false);
+}</handler><view align="center" height="${parent.field.height+5}" name="label" opacity="0.01" width="20"><ZloWidgets_roundbox fgcolor="0x111144" height="${parent.height}" opacity="0.7" width="${parent.width}"/></view><view align="center" font="ZloUI_communicate" fontsize="16" initstage="late" name="field" valign="middle"><view fgcolor="0x444444" name="top" x="2" y="2"><text name="field" resize="true" text="$path{'@title'}"/></view><view fgcolor="0xccffcc" name="bottom"><text resize="true" text="$path{'@title'}"/></view><handler name="oninit">if(classroot.getAttribute('minimized') != 'true'){
+  parent.label.animate('width', this.width+15, 500, false);
+}</handler><handler name="onmouseover">if(classroot.getAttribute('minimized') == 'true'){
+  parent.label.animate('opacity', 0.8, 500, false);
+  parent.label.animate('width', parent.field.width+15, 500, false);
+}</handler><handler name="onmouseout">if(classroot.getAttribute('minimized') == 'true'){
+  parent.label.animate('opacity', 0.01, 500, false);
+  parent.label.animate('width', 20, 500, false);
+}</handler><handler name="onclick">var obj = eval(classroot.datapath.getNodeAttribute('id'));
+obj.minimize();</handler></view></class><class extends="view" name="ZloUI_messageDialog" opacity="0"><method args="msg,time" name="display">this.pane.field.setText(msg);
+this.animate('opacity', 0.8, 200, false);
+if(!time){
+  time = 3000
+}
+this.hideDelegate = new LzDelegate(this, &quot;hide&quot;);
+LzTimer.addTimer(this.hideDelegate, time);</method><method name="hide">this.animate('opacity', 0, 2500, false);</method><ZloWidgets_roundbox fgcolor="0x000022" height="${parent.height}" width="${parent.width}"/><view align="center" name="pane" valign="middle"><text fgcolor="white" font="ZloUI_communicate" fontsize="14" name="field" resize="true" text="No Message"/></view></class><class clickable="true" extends="view" name="ZloUI_messageModal" opacity="0"><method args="msg" name="display">this.window.pane.field.setText(msg);
+this.animate('opacity', 0.8, 200, false);</method><method name="hide">this.animate('opacity', 0, 200, false);</method><ZloWidgets_roundbox fgcolor="0x000022" height="${parent.height}" width="${parent.width}"/><ZloWidgets_pillbox x="${parent.width-this.width-5}" y="5"><handler name="onclick">classroot.hide();</handler></ZloWidgets_pillbox><view height="${parent.height-(15*2)}" name="window" width="${parent.width-(15*2)}" x="15" y="15"><view clip="true" height="${parent.height}" name="pane" width="${parent.width}"><text fgcolor="white" multiline="true" name="field" resize="true" text="No Message" width="${parent.width-13}"/></view></view></class><class clip="true" height="400" name="ZloUI_SimpleWindow" opacity="0.01" width="200"><handler name="oninit">this.animate('opacity', 1, 400, false);</handler><ZloWidgets_roundbox fgcolor="0x000022" height="${parent.height}" opacity="0.95" width="${parent.width}"/><ZloWidgets_pillbox onclick="classroot.animate('opacity', 0, 400, false);var closeDelegate = new LzDelegate(this, &quot;close&quot;);LzTimer.addTimer(closeDelegate, 410);" x="${classroot.width-this.width-3}" y="3"><method name="close">classroot.destroy();</method></ZloWidgets_pillbox><dragstate name="dragger"/><resizestate name="resizer"/><handler name="onmousedown">this.dragger.apply();</handler><handler name="onmouseup">this.dragger.remove();</handler><ZloWidgets_roundbox fgcolor="0xb177f7" height="20" width="20" x="${classroot.width-this.width}" y="${classroot.height-this.height}"><handler name="onmousedown">classroot.resizer.apply();</handler><handler name="onmouseup">classroot.resizer.remove();</handler></ZloWidgets_roundbox></class><resource name="ZloUI_pythonpowered" src="icons/python-vert.png"/><resource name="ZloUI_laszlopowered" src="icons/laszlo.png"/><resource name="SystemModal_12_icon" src="icons/help_small.png"/><resource name="SystemModal_13_icon" src="icons/usersandgroups.png"/><dataset name="ZloACL_listusers" src="/xc/ZloACL/listusers" type="http"><handler name="ondata">ZloData_loadingflag.animate('opacity', 0.00, 700, false);
+if(ZloACL_listusers_response != false){
+  ZloACL_listusers_response.execute();
+}</handler></dataset><resource name="SystemModal_14_icon" src="icons/mail.png"/><resource name="SystemModalPlain_4_icon" src="icons/padlock1.png"/><dataset name="ZloData_secureSets"/><dataset name="ZloUI_SysTabsDataset"><tab id="ZloUI_UserInfoTab" label="User Info"/></dataset><dataset name="ZloUI_TaskBarDataset"><window height="640" id="parselzx_view_main_all0_window" minimized="false" title="parselzx" vmx="0" vmy="0" width="480" x="0" y="0"/><desktop icon="NONE" id="parselzx_view_main_all0_dekstop" minimized="false" security="anonymous" title="parselzx windows" vmx="1" vmy="1"/></dataset><dataset name="ZloUI_SysTrayDataset"><icon action="false" icon="SystemModal_12_icon" id="ZloUI_HelpTray" title="Help and Usage"/><icon action="false" icon="SystemModal_13_icon" id="ZloUI_UsersGroupsTray" title="Administration: Users and Groups"/><icon action="false" icon="SystemModal_14_icon" id="ZloUI_MessageTray" title="Intrasystem Messaging"/><icon action="false" icon="SystemModalPlain_4_icon" id="ZloUI_LoginTray" title="Login"/></dataset><debug/><dataset name="ZloUI_GlobalSettings"><activewindow id="null" title="Home Page"/></dataset><view><view initstage="late"><handler name="oninit">ZloUI_SystemMessage.display('Welcome to the LzXC Environment');</handler></view><view bgcolor="black" height="${canvas.height}" opacity="1" resource="ZloUI_Background" stretches="both" width="${canvas.width}"/><view height="185" opacity="0.7" width="25" x="5" y="${canvas.height-this.height-5}"><ZloWidgets_roundbox fgcolor="white" height="${parent.height}" opacity="0.7" width="${parent.width}"/><vbox height="${parent.height-20}" spacing="20" stretches="both" valign="middle" width="${parent.width}"><view onclick="LzBrowser.loadURL('http://www.openlaszlo.org', '_blank');" opacity="0.4" resource="ZloUI_laszlopowered"><handler name="onmouseover">this.animate('opacity', 1, 300, false);</handler><handler name="onmouseout">this.animate('opacity', 0.4, 300, false);</handler></view><view onclick="LzBrowser.loadURL('http://python.org', '_blank');" opacity="0.4" resource="ZloUI_pythonpowered"><handler name="onmouseover">this.animate('opacity', 1, 300, false);</handler><handler name="onmouseout">this.animate('opacity', 0.4, 300, false);</handler></view></vbox></view><view height="${parent.height}" id="ZloUI_master" width="${parent.width}" x="0" y="25"><view height="${canvas.height-(20*2)}" width="${canvas.width-(35*2)}" x="35" y="20"><view datapath="ZloData_securityset:/security/group[@name='anonymous']" height="${parent.height}" visible="$path{'@name=anonymous'}" width="${parent.width}"><ZloUI_DesktopShell clip="true" datapath="ZloUI_TaskBarDataset:/desktop[@id='parselzx_view_main_all0_dekstop']" height="${parent.height-30}" id="parselzx_view_main_all0_dekstop" minimized="$path{'@minimized'}" width="${parent.width}"><view id="parselzx_container"/></ZloUI_DesktopShell></view></view><view datapath="ZloData_securityset:/security/group[@name='anonymous']" height="${parent.height}" visible="$path{'@name=anonymous'}" width="${parent.width}"><ZloUI_window contentid="parselzx_view_main_all0_window_content" datapath="ZloUI_TaskBarDataset:/window[@id='parselzx_view_main_all0_window']" height="$path{'@height'}" id="parselzx_view_main_all0_window" minimized="$path{'@minimized'}" title="$path{'@title'}" width="$path{'@width'}" x="$path{'@x'}" y="$path{'@y'}"><view clip="true" height="${parent.height}" id="parselzx_view_main_all0_window_content" width="${parent.width}" x="10" y="23"><simplelayout axis="y" spacing="0"/><view name="params"><simplelayout axis="x" spacing="20"/><edittext name="path" selectable="true" text="LZX Code" width="300"/><ZloWidgets_smallGlassButton label="Submit" name="submit" onclick="new parselzx_onepage(parselzx_container, {path:parent.path.getText()})" valign="middle"/><ZloWidgets_smallGlassButton label="Clear History" valign="middle"><handler name="onclick">parselzx_clear_send(null, this, 'response');</handler><method name="response">parselzx_history_send(null, null);</method></ZloWidgets_smallGlassButton></view><view clip="true" height="${parent.height-parent.params.height}" width="${parent.width}"><view><simplelayout axis="y" spacing="0"/><view datapath="parselzx_history:/set/entry"><view bgcolor="0x0000ff" height="${parent.height}" onclick="new parselzx_onepage(parselzx_container, {path:parent.datapath.getNodeText(), fromhistory:'yes'});" opacity="0.01" width="${parent.width}"><handler name="onmouseover">this.setAttribute('bgcolor', '0x0000ff');
+this.animate('opacity', 0.4, 200, false, {motion:'easeout'});</handler><handler name="onmouseout">this.animate('opacity', 0.01, 200, false, {motion:'easeout'});</handler></view><text resize="true" text="$path{'text()'}"/></view></view></view></view></ZloUI_window></view></view><view font="ZloUI_foursticks" fontsize="18" height="25"><ZloWidgets_shadow height="${parent.height}" opacity="0.3" width="${canvas.width+20}" x="-10" y="8"/><view resource="ZloUI_GlassBar" stretches="width" width="${canvas.width}"/><view x="5"><simplelayout axis="x" spacing="0"/><view resource="ZloWidgets_closebubble" valign="middle" width="18"><handler name="oninit">this.alloff = false;</handler><method event="onmouseover">this.setColorTransform(ZloUI_ActiveSysTrayTint);</method><method event="onmouseout">this.setColorTransform(ZloUI_NoTint);</method><method event="onclick">var dp = canvas.datasets['ZloUI_TaskBarDataset'].getPointer();
+dp.selectChild();
+do{
+  win = eval(dp.getNodeAttribute('id'));
+  win.minimize(true);
+}while(dp.selectNext());</method></view><view clip="true"><view name="bar" valign="middle" width="${canvas.width/1.5}"><handler name="onx">if(this.x == 0) parent.glassL.setOpacity(0.01);
+else parent.glassL.setOpacity(1);
+if(this.x == -(windows.width-this.width)) parent.glassR.setOpacity(0.01);
+else parent.glassR.setOpacity(1);</handler><dragstate drag_axis="x" drag_max_x="0" drag_min_x="${-(windows.width-this.width)}" id="ZloUI_activeWinDragger"/><view name="windows" valign="middle"><simplelayout axis="x" spacing="0"/><ZloUI_StartBar datapath="ZloUI_TaskBarDataset:/desktop" minimized="$path{'@minimized'}" valign="middle"/><view height="1" width="7"/><ZloUI_StartBar datapath="ZloUI_TaskBarDataset:/window" minimized="$path{'@minimized'}" tint="true" valign="middle"/></view></view><view name="glassL" opacity="0" resource="ZloUI_GlassBarL"/><view name="glassR" resource="ZloUI_GlassBarR" x="${parent.bar.width-this.width}" y="0"/></view></view><view valign="middle" x="${canvas.width-this.width-5}"><simplelayout axis="x" spacing="5"/><ZloUI_SysTrayIcon action="$path{'@action'}" datapath="ZloUI_SysTrayDataset:/icon" height="20" resource="$path{'@icon'}" stretches="both" width="20"/><view height="20" id="ZloUI_vmtoggle" resource="ZloUI_VMIcon" stretches="both" width="20"><method event="onclick">if(ZloUI_vmviewstate){
+  ZloUI_vmtoggle.setColorTransform(ZloUI_NoTint);
+  ZloUI_vmdisplay.animate('y', -227, 500, true);
+  ZloUI_vmdisplay.animate('opacity', 0, 500, false);
+}
+else{
+  ZloUI_vmtoggle.setColorTransform(ZloUI_ActiveSysTrayTint);
+  ZloUI_vmdisplay.animate('y', 227, 500, true);
+  ZloUI_vmdisplay.animate('opacity', 1, 500, false);
+}
+ZloUI_vmviewstate = !ZloUI_vmviewstate;</method></view></view></view><view id="ZloUI_SimpleDesktops"/><view id="ZloUI_sideTabSize" resource="ZloUI_sideTabMiddle" visible="false"/><view width="${ZloUI_sideTabSize.resourcewidth}" x="${(canvas.width)}" y="30"><simplelayout axis="y" spacing="0"/><view datapath="ZloData_securityset:/security/group[@name='anonymous']" visible="$path{'@name=anonymous'}"><view height="${this.tab.height}" opacity="0.5" x="${-this.tab.width}"><simplelayout axis="x" spacing="0"/><ZloUI_sideTab datapath="ZloUI_SysTabsDataset:/tab[@id='ZloUI_UserInfoTab']" id="ZloUI_UserInfoTab" label="$path{'@label'}" name="tab"/><view clickable="true" clip="true" height="100" id="ZloUI_UserInfoTab_content" name="content" width="250"><ZloWidgets_roundbox fgcolor="0x979797" height="${parent.height}" width="${parent.width}"/><view align="center" valign="middle"><simplelayout axis="y" spacing="0"/><view><simplelayout axis="x" spacing="0"/><text resize="true" text="USER:"/><view datapath="ZloData_securityset:/security/user"><text resize="true" text="$path{'@name'}"/></view></view><view><simplelayout axis="x" spacing="0"/><text resize="true" text="GROUPS:"/><view datapath="ZloData_securityset:/security/group"><text resize="true" text="$path{'@name'}"/></view></view></view></view></view></view></view><view height="${canvas.height-26}" width="${canvas.width}" x="0" y="26"><view height="${parent.height-(10*2)}" width="${parent.width-(10*2)}" x="10" y="10"><view datapath="ZloData_securityset:/security/group[@name='anonymous']" height="${parent.height}" visible="$path{'@name=anonymous'}" width="${parent.width}"><ZloUI_modal clickable="true" contentid="ZloUI_HelpTray_content" height="${parent.height}" id="ZloUI_HelpTray" opacity="0" title="Help and Usage" width="${parent.width}"><view clip="true" height="${parent.height-80}" id="ZloUI_HelpTray_content" width="${parent.width-40}" x="20" y="60"><text fgcolor="white" resize="true" text="General Help Here"/></view></ZloUI_modal></view><view datapath="ZloData_securityset:/security/group[@name='admin']" height="${parent.height}" visible="$path{'@name=admin'}" width="${parent.width}"><ZloUI_modal clickable="true" contentid="ZloUI_UsersGroupsTray_content" height="${parent.height}" id="ZloUI_UsersGroupsTray" opacity="0" title="Administration: Users and Groups" width="${parent.width}"><view clip="true" height="${parent.height-80}" id="ZloUI_UsersGroupsTray_content" width="${parent.width-40}" x="20" y="60"><view><simplelayout axis="y" spacing="10"/><view><simplelayout axis="x" spacing="10"/><ZloWidgets_smallBarButton label="Add User" onclick="if(this.opened){parent.adduser.animate('width', 0, 300, false);}else{parent.adduser.animate('width', parent.adduser.fields.width, 300, false);}this.opened = !this.opened;" oninit="this.opened = false;" valign="middle"/><view clip="true" name="adduser" width="0"><view name="groups" password="true" text="(groups)"><simplelayout axis="x" spacing="0"/><edittext/><edittext/><edittext/><ZloWidgets_smallGlassButton label="Add" onclick="return false;" valign="middle"/></view></view></view><ZloWidgets_smallGlassButton label="Refresh List" onclick="ZloACL_listusers_send(null, null);"/><text fgcolor="white" fontsize="16" resize="true" text="Users in the system:"/><view datapath="ZloACL_listusers:/set"><simplelayout axis="y" spacing="5"/><view datapath="user"><simplelayout axis="y" spacing="0"/><text fgcolor="red" resize="true" text="$path{'@name'}"/><view x="20"><simplelayout axis="x" spacing="5"/><text fgcolor="white" resize="true" text="Groups:"/><view datapath="groups"><text fgcolor="0xcdcdcd" resize="true" text="$path{'@name'}"/></view></view></view></view></view></view></ZloUI_modal></view><view datapath="ZloData_securityset:/security/group[@name='users']" height="${parent.height}" visible="$path{'@name=users'}" width="${parent.width}"><ZloUI_modal clickable="true" contentid="ZloUI_MessageTray_content" height="${parent.height}" id="ZloUI_MessageTray" opacity="0" title="Intrasystem Messaging" width="${parent.width}"><view clip="true" height="${parent.height-80}" id="ZloUI_MessageTray_content" width="${parent.width-40}" x="20" y="60"><text fgcolor="white" resize="true" text="Messaging App Here"/></view></ZloUI_modal></view></view></view><view x="0" y="25"><view datapath="ZloData_securityset:/security/group[@name='anonymous']" height="${parent.height}" visible="$path{'@name=anonymous'}" width="${parent.width}"><view clickable="true" height="${parent.height}" id="ZloUI_LoginTray" opacity="0" width="${parent.width}"><view id="ZloUI_LoginTray_content"><ZloUI_LoginPane x="${canvas.width-this.width}" y="0"/></view></view></view></view><view id="ZloUI_vmdisplay" opacity="0" x="0" y="-200"><ZloUI_virtualmonitors height="${canvas.height/8}" width="${canvas.width/8}" x="${canvas.width-(this.width*2)}" y="0"/></view><view/><ZloUI_messageModal font="ZloUI_communicate" fontsize="16" height="400" id="ZloUI_SystemModalMessage" width="500" x="${canvas.width/2-this.width/2}" y="${canvas.height/2-this.height/2}"/><ZloUI_messageDialog height="100" id="ZloUI_SystemMessage" width="400" x="${canvas.width/2-this.width/2}" y="${canvas.height/2-this.height/2}"/></view><view height="20" id="ZloData_loadingflag" width="20" x="2" y="3"><ZloWidgets_roundbox fgcolor="black" height="${parent.height}" opacity="0.3" width="${parent.width}" x="1" y="1"/><ZloWidgets_roundbox fgcolor="0xAA4444" height="${parent.height}" width="${parent.width}"/></view></canvas>
